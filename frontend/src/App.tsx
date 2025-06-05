@@ -4,11 +4,12 @@ import TaskList from './components/TaskList';
 import { Task } from './types';
 import './App.css';
 
+
 function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const API_URL = 'http://localhost:5000/api';
+  const API_URL = '/api';
   console.log('API URL:', API_URL); // Add logging
 
   useEffect(() => {
