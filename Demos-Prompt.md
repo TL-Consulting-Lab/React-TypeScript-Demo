@@ -3,46 +3,39 @@ Copilot Prompts
 
 This document contains a collection of prompts and demonstrations showcasing the functionality and development process of the Task Management Application.
 
-## Application Setup
-
-Initial Deployment Commands
-
-> Create a full-stack TypeScript application with React frontend and Express backend
-
-This prompt initiated the project setup with:
-- Frontend: Create React App with TypeScript
-- Backend: Express.js with TypeScript
-- Basic project structure and dependencies
-
 ### Task Management Feature
 
-> Add task management functionality (add, show, delete tasks)
+1. **Add Task Categories**
+   - Modify the backend to support task categories
+   - Add a category field to tasks
 
-This demonstration showcases:
-- Creating Task interface
-- Implementing CRUD endpoints in the backend
-- Building TaskInput and TaskList components
-- Setting up state management in React
+>> "Add a task category field to the task of work, personal and urgent.
 
-## Troubleshooting Sessions
-> Can you help me fix this error in (Terminal, file, etc)
+2. **Add a task filter/Sorting feature**
+   - Add a drop down option to filter tasks by categories
 
-Example: Got the error on the http://localhost:3002/
+> "Add a drop down option to filter tasks by categories"
 
-Demonstrated:
-- Debugging port configuration
-- Handling TypeScript module issues
-- Resolving server startup problems
+3. **Add a feature to Edit and mark task as completed**
+
+> "Add a feature to Edit existing task"
 
 ## Test Implementation
 
-> Generate unit test for Frontend components and backend API endpoints
+4. **Write Unit Tests for add task categories**
+>> "Generate  unit tests for add task categories"
+>> > Generate unit test for Frontend components and backend API endpoints
 
 Implemented tests for:
 - Frontend components (TaskInput, TaskList)
 - Backend API endpoints
 - Error handling scenarios
 - State management
+
+5. ## Troubleshooting Sessions
+> Can you help me fix this error in (Terminal, file, etc)
+
+Example: Got the error on the http://localhost:3002/
 
 ## Error handling 
 
