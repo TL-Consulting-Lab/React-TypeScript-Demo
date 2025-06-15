@@ -1,9 +1,9 @@
-### Task Management Application - TypeScript and React
+## Task Management Application - TypeScript and React
 Copilot Prompts
 
 This document contains a collection of prompts and demonstrations showcasing the functionality and development process of the Task Management Application.
 
-## Task Management Feature
+### Task Management Feature
 
 1. **Add Task Categories**
    - Modify the backend to support task categories
@@ -20,7 +20,7 @@ This document contains a collection of prompts and demonstrations showcasing the
 
 > "Add a feature to Edit existing task"
 
-## Test Implementation
+### Test Implementation
 
 4. **Write Unit Tests for add task categories**
 > "Generate  unit tests for add task categories"
@@ -32,7 +32,7 @@ Implemented tests for:
 - Error handling scenarios
 - State management
 
-## Troubleshooting Sessions
+### Troubleshooting Sessions
 
 > Can you help me fix this error in (Terminal, file, etc)
 Example: Got the error on the http://localhost:3002/
@@ -40,7 +40,7 @@ Example: Got the error on the http://localhost:3002/
 5. **Error handling**
 > Add error handling features
 
-## Documentation
+### Documentation
 
 6. **/Generate documentation**
 > Generate Code comments
@@ -48,7 +48,7 @@ Example: Got the error on the http://localhost:3002/
 > Generate Setup instructions
 > Generate Development notes
 
-## Workflow Diagram
+### Workflow Diagram
 
 7. Create workflow diagram 
 > /Create workflow diagram
@@ -63,7 +63,7 @@ OR
 
 - GitHub Preview: If you push this to a GitHub repository, GitHub will automatically render the Mermaid diagrams in the markdown file.
 
-## Explain Code
+### Explain Code
 
 8. **Require Explanation/Help**
 > /explain Please explain this code base
