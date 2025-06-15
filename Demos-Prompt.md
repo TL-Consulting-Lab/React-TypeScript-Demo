@@ -3,13 +3,13 @@ Copilot Prompts
 
 This document contains a collection of prompts and demonstrations showcasing the functionality and development process of the Task Management Application.
 
-### Task Management Feature
+## Task Management Feature
 
 1. **Add Task Categories**
    - Modify the backend to support task categories
    - Add a category field to tasks
 
->> "Add a task category field to the task of work, personal and urgent.
+> "Add a task category field to the task of work, personal and urgent.
 
 2. **Add a task filter/Sorting feature**
    - Add a drop down option to filter tasks by categories
@@ -23,8 +23,8 @@ This document contains a collection of prompts and demonstrations showcasing the
 ## Test Implementation
 
 4. **Write Unit Tests for add task categories**
->> "Generate  unit tests for add task categories"
->> > Generate unit test for Frontend components and backend API endpoints
+> "Generate  unit tests for add task categories"
+> Generate unit test for Frontend components and backend API endpoints
 
 Implemented tests for:
 - Frontend components (TaskInput, TaskList)
@@ -32,18 +32,17 @@ Implemented tests for:
 - Error handling scenarios
 - State management
 
-5. ## Troubleshooting Sessions
-> Can you help me fix this error in (Terminal, file, etc)
+## Troubleshooting Sessions
 
+> Can you help me fix this error in (Terminal, file, etc)
 Example: Got the error on the http://localhost:3002/
 
-## Error handling 
-
+5. **Error handling**
 > Add error handling features
 
 ## Documentation
 
-> /Generate documentation
+6. **/Generate documentation**
 > Generate Code comments
 > Generate API documentation
 > Generate Setup instructions
@@ -51,6 +50,7 @@ Example: Got the error on the http://localhost:3002/
 
 ## Workflow Diagram
 
+7. Create workflow diagram 
 > /Create workflow diagram
 
 To view it as a diagram:
@@ -65,11 +65,12 @@ OR
 
 ## Explain Code
 
+8. **Require Explanation/Help**
 > /explain Please explain this code base
 
-## Check if servers are running
+9. **Check if servers are running**
 > check if both servers are running correctly
 
-# perform an action
+10. **perform an action**
 > run the app
 
