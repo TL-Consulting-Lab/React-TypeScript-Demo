@@ -1,5 +1,7 @@
 ## Task Management Application - TypeScript and React
-Copilot Prompts
+This is a full-stack task manager application with a TypeScript Express backend and React TypeScript frontend.
+
+### Copilot Prompts
 
 This document contains a collection of prompts and demonstrations showcasing the functionality and development process of the Task Management Application.
 
