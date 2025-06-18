@@ -7,7 +7,7 @@ This document contains a collection of prompts and demonstrations showcasing the
 
 ### Task Management Feature
 
-1. **Add Task Categories**
+1. **Add Task Categories features with a dropdown with options**
    - Modify the backend to support task categories
    - Add a category field to tasks
 
