@@ -5,6 +5,13 @@ This is a full-stack task manager application with a TypeScript Express backend 
 
 This document contains a collection of prompts and demonstrations showcasing the functionality and development process of the Task Management Application.
 
+## Run the app
+```
+Run the app Locally
+backend: http://localhost:5001
+frontend: http://localhost:3001
+```
+
 ### Task Management Feature
 
 1. **Add Task Categories features with a dropdown with options**
