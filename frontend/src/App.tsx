@@ -9,8 +9,8 @@ function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const API_URL = '/api';
-  console.log('API URL:', API_URL); // Add logging
+  const API_BASE_URL = 'http://localhost:5001';
+  console.log('API URL:', API_BASE_URL); // Add logging
 
   useEffect(() => {
     fetchTasks();
@@ -20,7 +20,7 @@ function App() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${API_URL}/tasks`);
+      const response = await fetch(`${API_BASE_URL}/api/tasks`);
       if (!response.ok) {
         throw new Error('Failed to fetch tasks');
       }
@@ -38,7 +38,7 @@ function App() {
     setError(null);
     try {
       console.log('Sending request to add task:', { title });
-      const response = await fetch(`${API_URL}/tasks`, {
+      const response = await fetch(`${API_BASE_URL}/api/tasks`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -64,7 +64,7 @@ function App() {
   const toggleTask = async (id: number) => {
     setError(null);
     try {
-      const response = await fetch(`${API_URL}/tasks/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/tasks/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -86,7 +86,7 @@ function App() {
   const deleteTask = async (id: number) => {
     setError(null);
     try {
-      const response = await fetch(`${API_URL}/tasks/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/tasks/${id}`, {
         method: 'DELETE',
       });
       if (!response.ok) {

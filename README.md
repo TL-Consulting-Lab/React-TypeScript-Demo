@@ -45,7 +45,7 @@ IDE Requirements:
    npm run dev
    ```
 
-The backend will run on http://localhost:5000
+The backend will run on http://localhost:5001
 
 ### Frontend
 
