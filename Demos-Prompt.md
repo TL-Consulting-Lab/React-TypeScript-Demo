@@ -1,22 +1,21 @@
-### Task Management Application - TypeScript and React
+# Task Management Application - TypeScript and React
 Copilot Prompts
 
 This document contains a collection of prompts and demonstrations showcasing the functionality and development process of the Task Management Application.
 
-## Application Setup
+## Explain Code
 
-Initial Deployment Commands
+- /explain Please explain this code base
 
-> Create a full-stack TypeScript application with React frontend and Express backend
+## Check if servers are running
+- check if both servers are running correctly
 
-This prompt initiated the project setup with:
-- Frontend: Create React App with TypeScript
-- Backend: Express.js with TypeScript
-- Basic project structure and dependencies
+# perform an action
+- run the app
 
-### Task Management Feature
+## Task Management Feature
 
-> Add task management functionality (add, show, delete tasks)
+- Add task management functionality (add, show, delete tasks)
 
 This demonstration showcases:
 - Creating Task interface
@@ -29,36 +28,31 @@ This demonstration showcases:
 
 Example: Got the error on the http://localhost:3002/
 
-Demonstrated:
-- Debugging port configuration
-- Handling TypeScript module issues
-- Resolving server startup problems
-
 ## Test Implementation
 
-> Generate unit test for Frontend components and backend API endpoints
+- Generate unit test for Frontend components and backend API endpoints
 
-Implemented tests for:
-- Frontend components (TaskInput, TaskList)
-- Backend API endpoints
-- Error handling scenarios
-- State management
+- Implement tests for:
+    - Frontend components (TaskInput, TaskList)
+    - Backend API endpoints
+    - Error handling scenarios
+    - State management
 
 ## Error handling 
 
-> Add error handling features
+- Add error handling features
 
 ## Documentation
 
-> /Generate documentation
-> Generate Code comments
-> Generate API documentation
-> Generate Setup instructions
-> Generate Development notes
+- Generate documentation
+- Generate Code comments
+- Generate API documentation
+- Generate Setup instructions
+- Generate Development notes
 
 ## Workflow Diagram
 
-> /Create workflow diagram
+- /Create workflow diagram
 
 To view it as a diagram:
 - Installing extension `Markdown Preview Mermaid Support'
@@ -70,13 +64,12 @@ OR
 
 - GitHub Preview: If you push this to a GitHub repository, GitHub will automatically render the Mermaid diagrams in the markdown file.
 
-## Explain Code
+## Create a pull request 
+- Create a pull request with a description and summary of changes made
 
-> /explain Please explain this code base
+## Add Copilot as a reviewer
+- Add Copilot as a reviewer to the pull request
 
-## Check if servers are running
-> check if both servers are running correctly
-
-# perform an action
-> run the app
+## Create an issue and assign it to Copilot
+- Create an issue in the repository and assign it to Copilot
 
