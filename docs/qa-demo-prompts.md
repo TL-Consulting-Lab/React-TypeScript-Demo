@@ -44,14 +44,13 @@ Write tests to validate rendering and interactions:
   - Callback invocation with correct arguments
 
 ## 3. Test Coverage Analysis
+- Analyze the code and suggest which branches or cases are missing from the current tests.
 
 - Include automated or manual analysis to:
 
   - Detect untested branches, logic paths, or conditions
   - Recommend test cases to improve coverage score
   - Validate that both happy paths and failure modes are exercised
-
-- Analyze the code and suggest which branches or cases are missing from the current tests.
 
 ## 4. App Component Integration Test Prompts
 
