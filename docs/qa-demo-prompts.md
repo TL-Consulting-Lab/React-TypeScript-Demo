@@ -27,7 +27,7 @@ Write unit tests for the Add Task feature in the backend, targeting a range of i
 ## 2. Frontend Component Integration Test Prompts (React Component)
 
 ### Add Task Form
-Create integration tests for ADD task component for the API endpoint, testing with both valid and invalid inputs
+Create integration tests for the frontend componebt for API endpoint, testing with both valid and invalid inputs
 
 Generate integration tests for a React component that accepts user input and triggers a callback. Cover:
   - Rendering of input fields and buttons
