@@ -37,7 +37,8 @@ Generate integration tests for a React component that accepts user input and tri
   - Accessibility and keyboard navigation
 
 ### Task List Component
-- Write tests to validate rendering and interactions:
+Write tests to validate rendering and interactions:
+
   - Rendering with empty and non-empty data
   - User interactions (toggle, delete)
   - Callback invocation with correct arguments
