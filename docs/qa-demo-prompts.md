@@ -29,7 +29,7 @@ Write unit tests for the Add Task feature in the backend, targeting a range of i
 ### Add Task Form
 Create integration tests for ADD task component for the API endpoint, testing with both valid and invalid inputs
 
-- Generate integration tests for a React component that accepts user input and triggers a callback. Cover:
+Generate integration tests for a React component that accepts user input and triggers a callback. Cover:
   - Rendering of input fields and buttons
   - Valid input submission and callback invocation
   - Prevention of empty or invalid submissions
@@ -54,18 +54,17 @@ Create integration tests for ADD task component for the API endpoint, testing wi
 
 ## 4. App Component Integration Test Prompts
 
-- Mocks network requests using native fetch mocking (avoid MSW for this demo)
-    Covers:
+Mocks network requests using native fetch mocking (avoid MSW for this demo)
+Covers:
  - Initial loading state
  - Empty list state
  - Error state from failed fetch
  
-- Submits form and validates:
+Submits form and validates:
  - POST and GET request flows
  - Correct API endpoints hit
  - UI updates accordingly (new task appears, loader hides, etc.)
-
-- Handles API errors gracefully and displays messages to users
+ - Handles API errors gracefully and displays messages to users
 
 ## 5. Backend API Integration Test Prompts
 
@@ -92,15 +91,3 @@ Create integration tests for ADD task component for the API endpoint, testing wi
     - API endpoints
     - Component props and usage
     - Error handling strategies 
-
-Use these prompts to guide your integration test generation. Focus on clarity, coverage, and reliability. Do not include code unless specifically requested; provide instructions and scenarios to cover.
-
-1. Integration Test Suggestions
-“Write integration tests for the interaction between this frontend component and the backend API.”
-
-2. Unit Test Generation
-“Create unit tests for this React component’s utility hook in TypeScript.”
-
-3. Coverage Improvement Prompts
-“Generate additional tests to increase code coverage for this module.”
-“Write tests to cover uncovered branches reported by coverage tools.”
