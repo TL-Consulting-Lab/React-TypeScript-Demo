@@ -13,7 +13,7 @@ This document provides clear instructions and prompts for generating robust unit
 
 ## 1. Backend Unit Test Prompts: 
 
-Write unit tests for the Add Task feature in the backend, targeting a range of inputs and conditions including covering all edge cases.
+Write unit tests using Jest for the Add Task feature in the backend, targeting a range of inputs and conditions including covering all edge cases.
 
 - Test Categories:
   - Successful Task Creation 
