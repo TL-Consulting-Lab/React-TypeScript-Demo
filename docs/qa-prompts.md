@@ -88,7 +88,7 @@ Write unit tests using Jest for the Add Task feature in the backend, targeting a
 
 #### 💬 **Frontend Component Integration:**
 ```
-Create integration tests for the frontend component for API endpoint, testing with both valid and invalid inputs
+Create integration tests for the frontend component for API endpoint, testing with both valid and invalid inputs using Playwright 
 ```
 
 </div>
