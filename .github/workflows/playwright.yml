@@ -1,0 +1,111 @@
+name: Playwright Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 18
+        cache: 'npm'
+        cache-dependency-path: |
+          frontend/package-lock.json
+          backend/package-lock.json
+
+    # Install backend dependencies
+    - name: Install backend dependencies
+      working-directory: ./backend
+      run: npm ci
+
+    # Install frontend dependencies
+    - name: Install frontend dependencies
+      working-directory: ./frontend
+      run: npm ci
+
+    # Install Playwright browsers
+    - name: Install Playwright Browsers
+      working-directory: ./frontend
+      run: npx playwright install --with-deps
+
+    # Build backend
+    - name: Build backend
+      working-directory: ./backend
+      run: npm run build
+
+    # Run backend tests (Jest)
+    - name: Run backend unit tests
+      working-directory: ./backend
+      run: npm test
+
+    # Run frontend tests (Jest)
+    - name: Run frontend unit tests
+      working-directory: ./frontend
+      run: npm test -- --coverage --watchAll=false
+
+    # Start backend in background
+    - name: Start backend server
+      working-directory: ./backend
+      run: npm run dev &
+      env:
+        NODE_ENV: test
+
+    # Wait for backend to be ready
+    - name: Wait for backend
+      run: |
+        timeout 30 bash -c 'until curl -f http://localhost:5000/api/tasks; do sleep 2; done'
+
+    # Start frontend in background
+    - name: Start frontend server
+      working-directory: ./frontend
+      run: npm start &
+      env:
+        CI: true
+
+    # Wait for frontend to be ready
+    - name: Wait for frontend
+      run: |
+        timeout 60 bash -c 'until curl -f http://localhost:3000; do sleep 2; done'
+
+    # Run Playwright tests
+    - name: Run Frontend E2E tests
+      working-directory: ./frontend
+      run: npx playwright test
+
+    # Run Backend API tests
+    - name: Run Backend E2E tests
+      working-directory: ./backend
+      run: npx playwright test
+
+    # Upload Playwright reports
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report-frontend
+        path: frontend/playwright-report/
+        retention-days: 30
+
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report-backend
+        path: backend/playwright-report/
+        retention-days: 30
+
+    # Upload test results
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: |
+          frontend/test-results/
+          backend/test-results/
+        retention-days: 30
