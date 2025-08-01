@@ -1,10 +1,13 @@
 import express from 'express';
 import cors from 'cors';
 
+type TaskCategory = 'work' | 'personal' | 'urgent';
+
 interface Task {
     id: number;
     title: string;
     completed: boolean;
+    category: TaskCategory;
     createdAt: Date;
 }
 
@@ -26,16 +29,23 @@ app.get('/api/tasks', (req, res) => {
 // Add a new task
 app.post('/api/tasks', (req, res) => {
     console.log('Received request body:', req.body);
-    const { title } = req.body;
+    const { title, category } = req.body;
     if (!title) {
         console.log('Title is missing');
         return res.status(400).json({ error: 'Title is required' });
+    }
+    
+    // Validate category
+    const validCategories: TaskCategory[] = ['work', 'personal', 'urgent'];
+    if (category && !validCategories.includes(category)) {
+        return res.status(400).json({ error: 'Invalid category. Must be work, personal, or urgent' });
     }
 
     const newTask: Task = {
         id: nextId++,
         title,
         completed: false,
+        category: category || 'personal', // Default to 'personal' if not provided
         createdAt: new Date()
     };
 

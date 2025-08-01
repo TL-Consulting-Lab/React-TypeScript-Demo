@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import TaskInput from './components/TaskInput';
 import TaskList from './components/TaskList';
-import { Task } from './types';
+import { Task, TaskCategory } from './types';
 import './App.css';
 
 
@@ -34,16 +34,16 @@ function App() {
     }
   };
 
-  const addTask = async (title: string) => {
+  const addTask = async (title: string, category: TaskCategory) => {
     setError(null);
     try {
-      console.log('Sending request to add task:', { title });
+      console.log('Sending request to add task:', { title, category });
       const response = await fetch(`${API_URL}/tasks`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ title }),
+        body: JSON.stringify({ title, category }),
       });
       
       const responseData = await response.json();
