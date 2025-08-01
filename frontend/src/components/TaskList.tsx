@@ -8,6 +8,19 @@ interface TaskListProps {
 }
 
 const TaskList: React.FC<TaskListProps> = ({ tasks, onToggleTask, onDeleteTask }) => {
+    const getCategoryIcon = (category: string) => {
+        switch (category) {
+            case 'work': return '💼';
+            case 'urgent': return '🚨';
+            case 'personal': return '👤';
+            default: return '📝';
+        }
+    };
+
+    const getCategoryClass = (category: string) => {
+        return `task-category task-category--${category}`;
+    };
+
     return (
         <ul className="task-list">
             {tasks.map((task) => (
@@ -18,6 +31,9 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onToggleTask, onDeleteTask }
                         onChange={() => onToggleTask(task.id)}
                         className="task-item__checkbox"
                     />
+                    <span className={getCategoryClass(task.category)}>
+                        {getCategoryIcon(task.category)} {task.category}
+                    </span>
                     <span className="task-item__title">{task.title}</span>
                     <button
                         onClick={() => onDeleteTask(task.id)}
