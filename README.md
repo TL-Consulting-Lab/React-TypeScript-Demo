@@ -112,6 +112,12 @@ Here's a chronological list of development steps and issues addressed:
    - Delete tasks
    - Real-time error feedback
    - Loading states for better UX
+   - **Voice input capability** (see [Voice Input Guide](docs/VOICE_INPUT_GUIDE.md))
+     - Add tasks using voice commands
+     - Support for English language
+     - 200 character limit
+     - Confirmation before task creation
+     - Works on mobile and desktop devices
 
 ## API Documentation
 

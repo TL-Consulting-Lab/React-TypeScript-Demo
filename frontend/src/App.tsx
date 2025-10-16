@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import TaskInput from './components/TaskInput';
 import TaskList from './components/TaskList';
 import { Task } from './types';
@@ -12,11 +12,7 @@ function App() {
   const API_URL = process.env.REACT_APP_API_URL || '/api';
   console.log('API URL:', API_URL); // Add logging
 
-  useEffect(() => {
-    fetchTasks();
-  }, []);
-
-  const fetchTasks = async () => {
+  const fetchTasks = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -32,7 +28,11 @@ function App() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [API_URL]);
+
+  useEffect(() => {
+    fetchTasks();
+  }, [fetchTasks]);
 
   const addTask = async (title: string) => {
     setError(null);
