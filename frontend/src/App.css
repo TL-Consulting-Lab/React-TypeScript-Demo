@@ -124,6 +124,149 @@
   font-style: italic;
 }
 
+.voice-input {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.voice-input__info {
+  font-size: 0.9rem;
+  color: #666;
+  text-align: center;
+}
+
+.voice-input__button {
+  padding: 12px 24px;
+  font-size: 1.1rem;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.voice-input__button:hover:not(:disabled) {
+  background-color: #218838;
+  transform: scale(1.05);
+}
+
+.voice-input__button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.voice-input__button.listening {
+  background-color: #dc3545;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+  }
+}
+
+.voice-input__confirmation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.voice-input__confirmation-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.voice-input__confirmation-dialog {
+  position: relative;
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 90%;
+  z-index: 1001;
+}
+
+.voice-input__confirmation-dialog h3 {
+  margin-top: 0;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.voice-input__transcript {
+  background-color: #f5f5f5;
+  padding: 1rem;
+  border-radius: 4px;
+  font-style: italic;
+  color: #333;
+  margin: 1rem 0;
+  word-wrap: break-word;
+}
+
+.voice-input__character-count {
+  font-size: 0.9rem;
+  color: #666;
+  text-align: right;
+  margin-bottom: 1rem;
+}
+
+.voice-input__confirmation-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.voice-input__confirm-button,
+.voice-input__cancel-button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.voice-input__confirm-button {
+  background-color: #28a745;
+  color: white;
+}
+
+.voice-input__confirm-button:hover {
+  background-color: #218838;
+}
+
+.voice-input__cancel-button {
+  background-color: #6c757d;
+  color: white;
+}
+
+.voice-input__cancel-button:hover {
+  background-color: #5a6268;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
