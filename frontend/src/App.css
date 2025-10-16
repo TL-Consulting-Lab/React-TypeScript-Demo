@@ -36,11 +36,15 @@
   padding: 20px;
 }
 
-.task-input {
+.task-input-container {
   margin-bottom: 2rem;
+}
+
+.task-input {
   display: flex;
   gap: 10px;
   justify-content: center;
+  margin-bottom: 1rem;
 }
 
 .task-input__field {
@@ -122,6 +126,143 @@
   padding: 20px;
   color: #666;
   font-style: italic;
+}
+
+/* Voice Input Styles */
+.voice-input-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 1rem;
+}
+
+.voice-input__character-limit {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #666;
+  text-align: center;
+}
+
+.voice-input__button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  font-size: 1rem;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.voice-input__button:hover:not(:disabled) {
+  background-color: #218838;
+}
+
+.voice-input__button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+.voice-input__button.listening {
+  background-color: #dc3545;
+  animation: pulse 1.5s infinite;
+}
+
+.microphone-icon {
+  width: 20px;
+  height: 20px;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* Confirmation Dialog Styles */
+.confirmation-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.confirmation-dialog__content {
+  background-color: white;
+  padding: 24px;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.confirmation-dialog__content h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: #282c34;
+}
+
+.confirmation-dialog__text {
+  background-color: #f5f5f5;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  color: #333;
+  word-wrap: break-word;
+  min-height: 50px;
+}
+
+.confirmation-dialog__char-count {
+  font-size: 0.875rem;
+  color: #666;
+  margin-bottom: 16px;
+  text-align: right;
+}
+
+.confirmation-dialog__buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.confirmation-dialog__button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.confirmation-dialog__button.confirm {
+  background-color: #0066cc;
+  color: white;
+}
+
+.confirmation-dialog__button.confirm:hover {
+  background-color: #0052a3;
+}
+
+.confirmation-dialog__button.cancel {
+  background-color: #6c757d;
+  color: white;
+}
+
+.confirmation-dialog__button.cancel:hover {
+  background-color: #5a6268;
 }
 
 @keyframes App-logo-spin {

@@ -23,7 +23,9 @@ describe('TaskInput Component', () => {
         fireEvent.click(button);
         
         expect(mockOnAddTask).not.toHaveBeenCalled();
-    });    it('handles valid task submission', async () => {
+    });
+
+    it('handles valid task submission', async () => {
         render(<TaskInput onAddTask={mockOnAddTask} />);
         
         const input = screen.getByPlaceholderText('Add a new task...');
@@ -42,5 +44,50 @@ describe('TaskInput Component', () => {
             await Promise.resolve();
         });
         expect(input).toHaveValue('');
+    });
+
+    it('displays voice input button when speech is supported', () => {
+        // Mock Speech Recognition
+        (window as any).SpeechRecognition = jest.fn().mockImplementation(() => ({
+            continuous: false,
+            interimResults: false,
+            lang: '',
+            onresult: null,
+            onerror: null,
+            onend: null,
+            start: jest.fn(),
+            stop: jest.fn(),
+        }));
+
+        render(<TaskInput onAddTask={mockOnAddTask} />);
+        
+        expect(screen.getByText('Voice Input')).toBeInTheDocument();
+        expect(screen.getByText(/Voice messages limited to 200 characters/i)).toBeInTheDocument();
+    });
+
+    it('does not display voice input button when speech is not supported', () => {
+        delete (window as any).SpeechRecognition;
+        delete (window as any).webkitSpeechRecognition;
+        
+        render(<TaskInput onAddTask={mockOnAddTask} />);
+        
+        expect(screen.queryByText('Voice Input')).not.toBeInTheDocument();
+    });
+
+    it('displays character limit message', () => {
+        (window as any).SpeechRecognition = jest.fn().mockImplementation(() => ({
+            continuous: false,
+            interimResults: false,
+            lang: '',
+            onresult: null,
+            onerror: null,
+            onend: null,
+            start: jest.fn(),
+            stop: jest.fn(),
+        }));
+
+        render(<TaskInput onAddTask={mockOnAddTask} />);
+        
+        expect(screen.getByText(/Voice messages limited to 200 characters/i)).toBeInTheDocument();
     });
 });
