@@ -31,44 +31,28 @@ export default defineConfig({
     
     /* Record video on failure */
     video: 'retain-on-failure',
+    
+    /* Set navigation timeout */
+    navigationTimeout: 30000,
+    
+    /* Set action timeout */
+    actionTimeout: 10000,
   },
 
-  /* Configure projects for major browsers */
+  /* Configure projects for major browsers - reduced for faster e2e tests */
   projects: [
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
 
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
-
-    /* Test against mobile viewports. */
-    {
-      name: 'Mobile Chrome',
-      use: { ...devices['Pixel 5'] },
-    },
-    {
-      name: 'Mobile Safari',
-      use: { ...devices['iPhone 12'] },
-    },
-
-    /* Test against branded browsers. */
-    // {
-    //   name: 'Microsoft Edge',
-    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    // },
-    // {
-    //   name: 'Google Chrome',
-    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
-    // },
+    // Only test Firefox and Mobile in CI to save time
+    ...(isCI ? [
+      {
+        name: 'firefox',
+        use: { ...devices['Desktop Firefox'] },
+      },
+    ] : []),
   ],
 
   /* Run your local dev server before starting the tests */

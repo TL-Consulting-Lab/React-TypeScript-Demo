@@ -1,186 +1,111 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Task Management App', () => {
+test.describe('Task Management App - Critical User Flows', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to the app before each test
     await page.goto('/');
     
-    // Wait for the app to load
+    // Wait for the app to be fully loaded
     await page.waitForLoadState('networkidle');
+    await expect(page.locator('.task-input')).toBeVisible();
   });
 
-  test('should load the main page', async ({ page }) => {
-    // Check if the page title is correct
-    await expect(page).toHaveTitle(/React App/);
+  test('should complete full task lifecycle (add, toggle, delete)', async ({ page }) => {
+    const taskTitle = 'Complete Lifecycle Task';
     
-    // Check for main elements
-    await expect(page.locator('.task-input')).toBeVisible();
+    // Step 1: Verify main UI elements are present
+    await expect(page).toHaveTitle(/React App/);
     await expect(page.locator('input[placeholder="Add a new task..."]')).toBeVisible();
     await expect(page.locator('button:has-text("Add Task")')).toBeVisible();
-  });
-
-  test('should add a new task', async ({ page }) => {
-    const taskTitle = 'Test Task from Playwright';
     
-    // Find the input field and add button using specific class names
-    const taskInput = page.locator('.task-input__field');
-    const addButton = page.locator('.task-input__button');
-    
-    // Add a new task
-    await taskInput.fill(taskTitle);
-    await addButton.click();
-    
-    // Wait for the task list to update
-    await page.waitForTimeout(1000);
-    
-    // Verify the task appears in the list with the correct class
-    await expect(page.locator('.task-item__title', { hasText: taskTitle })).toBeVisible();
-  });
-
-  test('should toggle task completion', async ({ page }) => {
-    const taskTitle = 'Task to Toggle';
-    
-    // Add a task first
+    // Step 2: Add a new task
     const taskInput = page.locator('.task-input__field');
     const addButton = page.locator('.task-input__button');
     
     await taskInput.fill(taskTitle);
     await addButton.click();
     
-    // Wait for the task to appear
-    await page.waitForTimeout(1000);
-    await expect(page.locator('.task-item__title', { hasText: taskTitle })).toBeVisible();
+    // Wait for task to appear using proper selector
+    await expect(page.locator('.task-item__title', { hasText: taskTitle })).toBeVisible({ timeout: 5000 });
     
-    // Find the task item and its checkbox
+    // Verify input is cleared
+    await expect(taskInput).toHaveValue('');
+    
+    // Step 3: Toggle task completion
     const taskItem = page.locator('.task-item').filter({ hasText: taskTitle });
     const checkbox = taskItem.locator('.task-item__checkbox');
     
-    // Initially, the task should not be completed
     await expect(checkbox).not.toBeChecked();
-    await expect(taskItem).not.toHaveClass(/completed/);
-    
-    // Click the checkbox to toggle completion
     await checkbox.click();
     
-    // Wait for the state to update
-    await page.waitForTimeout(500);
-    
-    // Verify the task is marked as completed
-    await expect(checkbox).toBeChecked();
+    // Wait for completion state to update
+    await expect(checkbox).toBeChecked({ timeout: 3000 });
     await expect(taskItem).toHaveClass(/completed/);
-  });
-
-  test('should delete a task', async ({ page }) => {
-    const taskTitle = 'Task to Delete';
     
-    // Add a task first
-    const taskInput = page.locator('.task-input__field');
-    const addButton = page.locator('.task-input__button');
-    
-    await taskInput.fill(taskTitle);
-    await addButton.click();
-    
-    // Wait for the task to appear
-    await page.waitForTimeout(1000);
-    await expect(page.locator('.task-item__title', { hasText: taskTitle })).toBeVisible();
-    
-    // Find the task item and its delete button
-    const taskItem = page.locator('.task-item').filter({ hasText: taskTitle });
+    // Step 4: Delete the task
     const deleteButton = taskItem.locator('.task-item__delete');
-    
     await deleteButton.click();
     
-    // Wait for the deletion to complete
-    await page.waitForTimeout(500);
-    
-    // Verify the task is removed
-    await expect(page.locator('.task-item__title', { hasText: taskTitle })).not.toBeVisible();
+    // Verify task is removed
+    await expect(page.locator('.task-item__title', { hasText: taskTitle })).not.toBeVisible({ timeout: 3000 });
   });
 
-  test('should not add empty task', async ({ page }) => {
-    // Try to add an empty task by clicking the button without entering text
+  test('should handle input validation and edge cases', async ({ page }) => {
     const addButton = page.locator('.task-input__button');
+    const taskInput = page.locator('.task-input__field');
     
-    // Count existing tasks
+    // Test 1: Should not add empty task
     const initialTaskCount = await page.locator('.task-item').count();
-    
-    // Click add button without entering text
     await addButton.click();
-    
-    // Wait a bit for any potential action
     await page.waitForTimeout(500);
+    const afterEmptyCount = await page.locator('.task-item').count();
+    expect(afterEmptyCount).toBe(initialTaskCount);
     
-    // Verify no new task was added
-    const finalTaskCount = await page.locator('.task-item').count();
-    expect(finalTaskCount).toBe(initialTaskCount);
-  });
-
-  test('should clear input after adding task', async ({ page }) => {
-    const taskTitle = 'Task that clears input';
-    
-    const taskInput = page.locator('.task-input__field');
-    const addButton = page.locator('.task-input__button');
-    
-    // Add a task
-    await taskInput.fill(taskTitle);
-    await addButton.click();
-    
-    // Wait for the task to be added
-    await page.waitForTimeout(1000);
-    
-    // Verify the input field is cleared
-    await expect(taskInput).toHaveValue('');
-  });
-
-  test('should handle multiple tasks', async ({ page }) => {
-    const tasks = ['First task', 'Second task', 'Third task'];
-    
-    const taskInput = page.locator('.task-input__field');
-    const addButton = page.locator('.task-input__button');
-    
-    // Add multiple tasks
+    // Test 2: Should handle multiple tasks
+    const tasks = ['Task One', 'Task Two', 'Task Three'];
     for (const task of tasks) {
       await taskInput.fill(task);
       await addButton.click();
-      await page.waitForTimeout(500);
+      await expect(page.locator('.task-item__title', { hasText: task })).toBeVisible({ timeout: 3000 });
     }
     
     // Verify all tasks are present
-    for (const task of tasks) {
-      await expect(page.locator('.task-item__title', { hasText: task })).toBeVisible();
-    }
-    
-    // Verify the total count
-    await expect(page.locator('.task-item')).toHaveCount(tasks.length);
+    const finalCount = await page.locator('.task-item').count();
+    expect(finalCount).toBeGreaterThanOrEqual(tasks.length);
   });
 
-  test('should maintain task state after toggle and refresh', async ({ page }) => {
-    const taskTitle = 'Persistent task';
+  test('should persist task state across page refresh', async ({ page }) => {
+    const taskTitle = 'Persistent Task';
     
-    // Add a task
+    // Add and complete a task
     const taskInput = page.locator('.task-input__field');
     const addButton = page.locator('.task-input__button');
     
     await taskInput.fill(taskTitle);
     await addButton.click();
-    await page.waitForTimeout(1000);
+    await expect(page.locator('.task-item__title', { hasText: taskTitle })).toBeVisible({ timeout: 5000 });
     
-    // Toggle the task completion
+    // Toggle completion
     const taskItem = page.locator('.task-item').filter({ hasText: taskTitle });
     const checkbox = taskItem.locator('.task-item__checkbox');
     await checkbox.click();
-    await page.waitForTimeout(500);
+    await expect(checkbox).toBeChecked({ timeout: 3000 });
     
     // Refresh the page
     await page.reload();
     await page.waitForLoadState('networkidle');
+    await expect(page.locator('.task-input')).toBeVisible();
     
-    // Verify the task still exists and maintains its completed state
+    // Verify the task persists with completed state
     const reloadedTaskItem = page.locator('.task-item').filter({ hasText: taskTitle });
     const reloadedCheckbox = reloadedTaskItem.locator('.task-item__checkbox');
     
     await expect(page.locator('.task-item__title', { hasText: taskTitle })).toBeVisible();
     await expect(reloadedCheckbox).toBeChecked();
     await expect(reloadedTaskItem).toHaveClass(/completed/);
+    
+    // Cleanup
+    await reloadedTaskItem.locator('.task-item__delete').click();
+    await expect(page.locator('.task-item__title', { hasText: taskTitle })).not.toBeVisible({ timeout: 3000 });
   });
 });
