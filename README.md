@@ -28,6 +28,8 @@ IDE Requirements:
 
 ## Getting Started
 
+**Important**: Both the backend and frontend servers need to be running for the application to work properly.
+
 ### Backend
 
 1. Navigate to the backend directory:
@@ -46,6 +48,8 @@ IDE Requirements:
    ```
 
 The backend will run on http://localhost:5000
+
+You can verify the backend is running by visiting http://localhost:5000/health
 
 ### Frontend
 
@@ -104,6 +108,9 @@ Here's a chronological list of development steps and issues addressed:
    - Resolved backend server startup issues
    - Added proper error handling and loading states
    - Fixed task creation functionality
+   - Improved backend server binding for better network compatibility (binds to 0.0.0.0)
+   - Added comprehensive error handling for server startup failures
+   - Added health check endpoint for monitoring server status
 
 4. Features Implemented
    - Add new tasks
@@ -122,6 +129,16 @@ Here's a chronological list of development steps and issues addressed:
 ## API Documentation
 
 ### Endpoints
+
+#### GET /health
+- Description: Health check endpoint to verify server is running
+- Response:
+```typescript
+{
+  status: "ok",
+  timestamp: string (ISO 8601 date)
+}
+```
 
 #### GET /api/tasks
 - Description: Retrieve all tasks
@@ -302,6 +319,45 @@ cd backend
 npm run build
 ```
 2. The dist folder will contain compiled JavaScript ready for deployment
+
+## Troubleshooting
+
+### "Failed to fetch" Error
+
+If you see a "Failed to fetch" error message when the application loads:
+
+1. **Make sure the backend server is running**: The backend must be started before the frontend can fetch data
+   ```bash
+   cd backend
+   npm run dev
+   ```
+
+2. **Verify the backend is accessible**: Visit http://localhost:5000/health in your browser. You should see:
+   ```json
+   {"status":"ok","timestamp":"..."}
+   ```
+
+3. **Check if the port is already in use**: If you see "Port 5000 is already in use", stop the other process or change the port:
+   ```bash
+   PORT=5001 npm run dev
+   ```
+
+### Common Issues
+
+**Backend won't start**
+- Check if another process is using port 5000
+- Ensure you've run `npm install` in the backend directory
+- Check for TypeScript compilation errors
+
+**Frontend can't connect to backend**
+- Verify the backend is running on port 5000
+- Check that the proxy setting in `frontend/package.json` points to the correct backend URL
+- Clear your browser cache and restart the frontend server
+
+**Voice input not working**
+- Voice input requires a compatible browser (Chrome, Edge, or Safari)
+- Grant microphone permissions when prompted
+- Ensure the backend is running as voice input creates tasks via API
 
 ## License
 

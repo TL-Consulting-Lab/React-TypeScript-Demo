@@ -9,6 +9,15 @@ describe('Task API Endpoints', () => {
         server = app;
     });
 
+    describe('GET /health', () => {
+        it('should return health status', async () => {
+            const res = await request(server).get('/health');
+            expect(res.status).toBe(200);
+            expect(res.body).toHaveProperty('status', 'ok');
+            expect(res.body).toHaveProperty('timestamp');
+        });
+    });
+
     describe('GET /api/tasks', () => {
         it('should return all tasks', async () => {
             const res = await request(server).get('/api/tasks');
