@@ -103,6 +103,13 @@ app.delete('/api/tasks/:id', (req, res) => {
     res.status(200).json({ message: 'Task deleted successfully' });
 });
 
+// Clear all tasks (for testing purposes)
+app.delete('/api/tasks', (req, res) => {
+    tasks = [];
+    nextId = 1;
+    res.status(200).json({ message: 'All tasks cleared' });
+});
+
 // Only start the server if this file is run directly
 if (require.main === module) {
     app.listen(port, () => {
