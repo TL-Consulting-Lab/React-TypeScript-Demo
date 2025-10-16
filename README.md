@@ -154,6 +154,13 @@ Here's a chronological list of development steps and issues addressed:
 ]
 ```
 
+#### GET /api/tasks/:id
+- Description: Retrieve a specific task by ID
+- Parameters:
+  - id: Task ID (number)
+- Response: Task object
+- Error: 404 if task not found
+
 #### POST /api/tasks
 - Description: Create a new task
 - Request Body:
@@ -163,18 +170,50 @@ Here's a chronological list of development steps and issues addressed:
 }
 ```
 - Response: Created Task object
+- Status Code: 201 Created
+- Validation: Title is required and cannot be empty
 
 #### PATCH /api/tasks/:id
 - Description: Toggle task completion status
 - Parameters: 
   - id: Task ID (number)
 - Response: Updated Task object
+- Error: 404 if task not found
 
-#### DELETE /api/tasks/:id
-- Description: Delete a task
+#### PUT /api/tasks/:id
+- Description: Update task properties (title and/or completed status)
 - Parameters:
   - id: Task ID (number)
-- Response: 204 No Content
+- Request Body:
+```typescript
+{
+  title?: string,
+  completed?: boolean
+}
+```
+- Response: Updated Task object
+- Error: 404 if task not found
+
+#### DELETE /api/tasks/:id
+- Description: Delete a specific task
+- Parameters:
+  - id: Task ID (number)
+- Response: 200 OK with success message
+```typescript
+{
+  message: "Task deleted successfully"
+}
+```
+- Error: 404 if task not found
+
+#### DELETE /api/tasks
+- Description: Clear all tasks (useful for testing)
+- Response: 200 OK with success message
+```typescript
+{
+  message: "All tasks cleared"
+}
+```
 
 ## Component Documentation
 

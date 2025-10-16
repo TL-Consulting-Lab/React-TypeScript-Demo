@@ -23,6 +23,18 @@ app.get('/api/tasks', (req, res) => {
     res.json(tasks);
 });
 
+// Get a single task by ID
+app.get('/api/tasks/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    const task = tasks.find(task => task.id === id);
+    
+    if (!task) {
+        return res.status(404).json({ error: 'Task not found' });
+    }
+
+    res.json(task);
+});
+
 // Add a new task
 app.post('/api/tasks', (req, res) => {
     console.log('Received request body:', req.body);
@@ -57,6 +69,27 @@ app.patch('/api/tasks/:id', (req, res) => {
     res.json(tasks[taskIndex]);
 });
 
+// Update task (PUT method for full update)
+app.put('/api/tasks/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    const taskIndex = tasks.findIndex(task => task.id === id);
+    
+    if (taskIndex === -1) {
+        return res.status(404).json({ error: 'Task not found' });
+    }
+
+    const { title, completed } = req.body;
+    
+    if (title !== undefined) {
+        tasks[taskIndex].title = title;
+    }
+    if (completed !== undefined) {
+        tasks[taskIndex].completed = completed;
+    }
+    
+    res.json(tasks[taskIndex]);
+});
+
 // Delete a task
 app.delete('/api/tasks/:id', (req, res) => {
     const id = parseInt(req.params.id);
@@ -67,7 +100,14 @@ app.delete('/api/tasks/:id', (req, res) => {
     }
 
     tasks = tasks.filter(task => task.id !== id);
-    res.status(204).send();
+    res.status(200).json({ message: 'Task deleted successfully' });
+});
+
+// Clear all tasks (for testing purposes)
+app.delete('/api/tasks', (req, res) => {
+    tasks = [];
+    nextId = 1;
+    res.status(200).json({ message: 'All tasks cleared' });
 });
 
 // Health check endpoint

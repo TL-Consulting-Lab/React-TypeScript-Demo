@@ -233,6 +233,12 @@ export const Utils = {
   async clearAllTasks(page: Page): Promise<void> {
     const apiHelper = new ApiHelper(page);
     try {
+      // Try using the clear all endpoint first
+      const response = await page.request.delete('http://localhost:5000/api/tasks');
+      if (response.status() === 200) {
+        return;
+      }
+      // Fallback to deleting individual tasks
       const tasks = await apiHelper.getTasks();
       for (const task of tasks) {
         await apiHelper.deleteTask(task.id);

@@ -88,7 +88,9 @@ describe('Task API Endpoints', () => {
             const res = await request(server)
                 .delete(`/api/tasks/${taskId}`);
 
-            expect(res.status).toBe(204);
+            expect(res.status).toBe(200);
+            expect(res.body).toHaveProperty('message');
+            expect(res.body.message).toBe('Task deleted successfully');
         });
 
         it('should return 404 for non-existent task', async () => {
