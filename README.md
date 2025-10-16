@@ -288,19 +288,64 @@ interface Task {
 
 ## Testing
 
-To run tests:
+This project follows the **Test Pyramid** approach for comprehensive testing at different levels. See [Testing Strategy](docs/TESTING_STRATEGY.md) for detailed information.
 
-### Frontend
+### Quick Start
+
+#### Run All Tests
+```bash
+# Backend
+cd backend
+npm test              # Unit tests (Jest)
+npm run test:e2e      # Integration/API tests (Playwright)
+
+# Frontend
+cd frontend
+npm test              # Unit tests (Jest)
+npm run test:e2e      # E2E tests (Playwright)
+```
+
+#### Test Distribution
+
+Following the test pyramid:
+- **Unit Tests** (Many, Fast): 23 tests covering components and API logic
+- **Integration Tests** (Some, Medium): 11 tests for API contracts
+- **E2E Tests** (Few, Slow): 10 tests for critical user flows
+
+### E2E Testing with Playwright
+
+First-time setup:
 ```bash
 cd frontend
-npm test
+npm run playwright:install
 ```
 
-### Backend
+Run E2E tests:
 ```bash
-cd backend
-npm test
+# Run tests
+npm run test:e2e
+
+# Run with UI mode (interactive debugging)
+npm run test:e2e:ui
+
+# Run in headed mode (watch browser)
+npm run test:e2e:headed
+
+# Debug mode
+npm run test:e2e:debug
 ```
+
+**Important**: E2E tests require both backend and frontend servers to be running. The test configuration will start them automatically in development mode.
+
+### Test Guidelines
+
+- Write **unit tests** for individual components and functions
+- Write **integration tests** for API endpoints and service interactions  
+- Write **E2E tests** only for critical user journeys
+- Use proper wait conditions instead of arbitrary timeouts
+- Follow the test pyramid to keep tests fast and maintainable
+
+See [Testing Strategy](docs/TESTING_STRATEGY.md) for best practices and detailed guidelines.
 
 ## Deployment
 
