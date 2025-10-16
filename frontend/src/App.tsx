@@ -9,7 +9,7 @@ function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const API_URL = '/api';
+  const API_URL = process.env.REACT_APP_API_URL || '/api';
   console.log('API URL:', API_URL); // Add logging
 
   useEffect(() => {
