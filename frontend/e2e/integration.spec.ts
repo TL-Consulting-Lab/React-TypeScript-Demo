@@ -4,7 +4,22 @@ test.describe('Full Stack Integration Tests', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('http://localhost:3000');
     await page.waitForLoadState('networkidle');
+    
+    // Wait for the task input to be visible
     await expect(page.locator('.task-input')).toBeVisible({ timeout: 10000 });
+    
+    // Verify no error messages are shown (backend is responding)
+    // If there's an error, wait a bit and reload
+    const errorMessage = page.locator('.error-message');
+    const hasError = await errorMessage.isVisible().catch(() => false);
+    if (hasError) {
+      console.log('Initial load had error, reloading page...');
+      await page.reload();
+      await page.waitForLoadState('networkidle');
+      await expect(page.locator('.task-input')).toBeVisible({ timeout: 10000 });
+      // Error should be gone after reload
+      await expect(errorMessage).not.toBeVisible();
+    }
   });
 
   test('Full task lifecycle - Frontend and Backend sync', async ({ page }) => {
