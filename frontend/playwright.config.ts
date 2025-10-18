@@ -56,18 +56,23 @@ export default defineConfig({
   ],
 
   /* Run your local dev server before starting the tests */
+  /* IMPORTANT: Backend MUST start before frontend to prevent "Failed to fetch" errors.
+     When using an array, Playwright waits for each server sequentially in order.
+     The backend is checked at /api/tasks endpoint to ensure it's fully ready. */
   webServer: isCI ? undefined : [
     {
       command: 'cd ../backend && npm run dev',
       url: 'http://localhost:5000/api/tasks',
       reuseExistingServer: true,
       timeout: 120 * 1000,
+      // Wait for backend to be fully responsive
     },
     {
       command: 'npm start',
       url: 'http://localhost:3000',
       reuseExistingServer: true,
       timeout: 180 * 1000,
+      // Frontend starts only after backend is ready
     },
   ],
 });

@@ -11,6 +11,8 @@ The frontend E2E tests were experiencing "Failed to fetch tasks" errors when the
 
 ## Root Cause
 
+**YES, the frontend IS loading before the backend is fully initialized.**
+
 The timing issue occurs in this sequence:
 1. Test navigates to the page
 2. Frontend loads and immediately fetches tasks (via `useEffect`)
@@ -18,17 +20,58 @@ The timing issue occurs in this sequence:
 4. Error message "Failed to fetch tasks" appears in red
 5. Tests proceed without checking for this error state
 
+### Why This Happens
+
+In **Local Development** (using `playwright.config.ts`):
+- The `webServer` array configuration starts both backend and frontend
+- While Playwright processes the array sequentially, there's a timing window where:
+  - Backend starts and passes its health check (`http://localhost:5000/api/tasks`)
+  - Frontend immediately starts and makes its first request
+  - Backend might still be initializing some resources
+  - This race condition causes intermittent failures
+
+In **CI** (GitHub Actions):
+- The workflow explicitly starts backend first, waits for it to be ready, then starts frontend
+- An additional 5-second delay after frontend starts gives backend more time
+- This works more reliably but the frontend's immediate fetch can still race
+
 ## Solution
 
-Added error detection and recovery in the `beforeEach` hooks of all E2E test files:
+A **two-layer defense** approach:
 
-1. **app.spec.ts**: Added check for error message after initial load
-2. **integration.spec.ts**: Added check for error message after initial load
-3. **page-objects.ts**: Updated `navigateToApp()` method to handle errors
+### Layer 1: Proper Server Startup Order (Already Implemented)
 
-### Implementation
+**In CI (GitHub Actions):**
+```yaml
+1. Start backend → Wait with retry logic (up to 40 attempts × 3 sec = 2 minutes)
+2. Verify backend responds to /api/tasks
+3. Start frontend → Wait with retry logic (up to 60 attempts × 3 sec = 3 minutes)
+4. Extra 5-second delay for initialization
+5. Verify both services are healthy
+6. Run tests
+```
 
-The fix adds the following logic after waiting for the page to load:
+**In Local Development (playwright.config.ts):**
+```typescript
+webServer: [
+  {
+    command: 'cd ../backend && npm run dev',
+    url: 'http://localhost:5000/api/tasks',  // Backend MUST respond before continuing
+    timeout: 120 * 1000,
+  },
+  {
+    command: 'npm start',
+    url: 'http://localhost:3000',  // Frontend starts AFTER backend is ready
+    timeout: 180 * 1000,
+  },
+]
+```
+
+Playwright processes the `webServer` array **sequentially**, ensuring backend is ready before frontend starts.
+
+### Layer 2: Error Detection and Recovery in Tests (Failsafe)
+
+Even with proper startup order, there's still a small timing window where the frontend's immediate fetch might fail. The tests include a failsafe mechanism:
 
 ```typescript
 // Wait for the task input to be visible (app is loaded)
@@ -58,9 +101,11 @@ if (hasError) {
 
 ## Files Modified
 
-1. `frontend/e2e/app.spec.ts` - Updated `beforeEach` hook
-2. `frontend/e2e/integration.spec.ts` - Updated `beforeEach` hook  
-3. `frontend/e2e/helpers/page-objects.ts` - Updated `navigateToApp()` method
+1. `frontend/e2e/app.spec.ts` - Updated `beforeEach` hook with error detection
+2. `frontend/e2e/integration.spec.ts` - Updated `beforeEach` hook with error detection
+3. `frontend/e2e/helpers/page-objects.ts` - Updated `navigateToApp()` method with error detection
+4. `frontend/playwright.config.ts` - Added comments clarifying sequential startup order
+5. `.github/workflows/playwright.yml` - Explicit sequential startup with health checks
 
 ## Testing
 
@@ -70,6 +115,19 @@ This fix ensures:
 - ✅ Backend has adequate time to be fully ready before tests run
 - ✅ Tests handle timing issues gracefully with automatic recovery
 - ✅ Proper cleanup between tests (no lingering errors)
+
+## Answer to "Is frontend loading before backend?"
+
+**Yes**, the frontend CAN load before the backend is fully initialized, causing test failures. This happens due to:
+
+1. **Race condition**: Even with sequential startup, there's a timing window
+2. **Immediate fetch**: Frontend's `useEffect` runs immediately on mount
+3. **Backend initialization**: Backend might still be setting up resources even after passing health check
+
+**The solution**: 
+- Sequential server startup (backend first, then frontend)
+- Error detection and recovery in tests as a failsafe
+- Adequate wait times and health checks in CI
 
 ## Related
 
