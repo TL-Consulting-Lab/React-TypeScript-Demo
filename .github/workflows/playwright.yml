@@ -68,7 +68,7 @@ jobs:
       run: |
         echo "Waiting for backend to be ready..."
         for i in {1..40}; do
-          if curl -f http://localhost:5000/api/tasks 2>/dev/null; then
+          if curl -f --connect-timeout 5 --max-time 10 http://localhost:5000/api/tasks; then
             echo "Backend is ready!"
             # Give backend extra time to be fully initialized
             sleep 5
@@ -79,7 +79,10 @@ jobs:
           sleep 3
         done
         echo "Backend failed to start!"
+        echo "=== Backend logs ==="
         cat backend/backend.log || true
+        echo "=== Checking if backend process is running ==="
+        ps aux | grep -i "node\|ts-node" || true
         exit 1
 
     # Start frontend in background - STARTS AFTER BACKEND
@@ -104,7 +107,7 @@ jobs:
       run: |
         echo "Waiting for frontend to be ready..."
         for i in {1..60}; do
-          if curl -f http://localhost:3000 2>/dev/null; then
+          if curl -f --connect-timeout 5 --max-time 10 http://localhost:3000; then
             echo "Frontend is ready!"
             # Give it extra time to fully initialize and connect to backend
             # The frontend makes an immediate fetch on mount, so we need to wait
@@ -121,7 +124,10 @@ jobs:
           sleep 3
         done
         echo "Frontend failed to start!"
+        echo "=== Frontend logs ==="
         cat frontend/frontend.log || true
+        echo "=== Checking if frontend process is running ==="
+        ps aux | grep -i "node\|react-scripts" || true
         exit 1
 
     # Verify both services are responding without errors
@@ -134,16 +140,16 @@ jobs:
         echo "Frontend: http://localhost:3000 (proxying /api to localhost:5000)"
         echo ""
         echo "Checking backend health..."
-        curl -f http://localhost:5000/api/tasks -v || (echo "❌ Backend health check failed!" && cat backend/backend.log && exit 1)
+        curl -f --connect-timeout 5 --max-time 10 http://localhost:5000/api/tasks -v || (echo "❌ Backend health check failed!" && cat backend/backend.log && exit 1)
         echo "✅ Backend is healthy"
         echo ""
         echo "Checking frontend health..."
-        curl -f http://localhost:3000 -v || (echo "❌ Frontend health check failed!" && cat frontend/frontend.log && exit 1)
+        curl -f --connect-timeout 5 --max-time 10 http://localhost:3000 -v || (echo "❌ Frontend health check failed!" && cat frontend/frontend.log && exit 1)
         echo "✅ Frontend is healthy"
         echo ""
         echo "Testing frontend-to-backend proxy connectivity..."
         # The frontend should be serving and should have proxy configured
-        FRONTEND_HTML=$(curl -s http://localhost:3000)
+        FRONTEND_HTML=$(curl -s --connect-timeout 5 --max-time 10 http://localhost:3000)
         if echo "$FRONTEND_HTML" | grep -q "Task Manager"; then
           echo "✅ Frontend is serving correctly"
         else
@@ -160,7 +166,7 @@ jobs:
         echo "Testing backend-frontend connectivity..."
         echo ""
         echo "1. Backend direct test (bypass proxy)..."
-        BACKEND_CODE=$(curl -s -o /tmp/backend_direct.txt -w "%{http_code}" http://localhost:5000/api/tasks)
+        BACKEND_CODE=$(curl -s --connect-timeout 5 --max-time 10 -o /tmp/backend_direct.txt -w "%{http_code}" http://localhost:5000/api/tasks)
         echo "   Backend response code: $BACKEND_CODE"
         if [ "$BACKEND_CODE" = "200" ]; then
           echo "   ✅ Backend is accessible directly"
@@ -172,7 +178,7 @@ jobs:
         
         echo ""
         echo "2. Frontend proxy test (through React dev server)..."
-        PROXY_HTTP_CODE=$(curl -s -o /tmp/proxy_response.txt -w "%{http_code}" http://localhost:3000/api/tasks)
+        PROXY_HTTP_CODE=$(curl -s --connect-timeout 5 --max-time 10 -o /tmp/proxy_response.txt -w "%{http_code}" http://localhost:3000/api/tasks)
         PROXY_BODY=$(cat /tmp/proxy_response.txt)
         
         echo "   Proxy HTTP Code: $PROXY_HTTP_CODE"
@@ -218,11 +224,11 @@ jobs:
       run: |
         echo "=== Pre-test Network Verification ==="
         echo "Verifying backend is accessible from test environment..."
-        curl -f http://localhost:5000/api/tasks -s || (echo "ERROR: Backend not accessible!" && exit 1)
+        curl -f --connect-timeout 5 --max-time 10 http://localhost:5000/api/tasks -s || (echo "ERROR: Backend not accessible!" && exit 1)
         echo "Backend is accessible ✓"
         echo ""
         echo "Verifying frontend is serving..."
-        curl -f http://localhost:3000 -s > /dev/null || (echo "ERROR: Frontend not accessible!" && exit 1)
+        curl -f --connect-timeout 5 --max-time 10 http://localhost:3000 -s > /dev/null || (echo "ERROR: Frontend not accessible!" && exit 1)
         echo "Frontend is accessible ✓"
         echo ""
         echo "=== Running Playwright Tests ==="
@@ -238,7 +244,7 @@ jobs:
       run: |
         echo "=== Running Backend API Tests ==="
         echo "Backend should be accessible at localhost:5000"
-        curl -f http://localhost:5000/api/tasks -s || (echo "ERROR: Backend not accessible for API tests!" && exit 1)
+        curl -f --connect-timeout 5 --max-time 10 http://localhost:5000/api/tasks -s || (echo "ERROR: Backend not accessible for API tests!" && exit 1)
         echo "Backend is accessible ✓"
         echo ""
         npx playwright test
