@@ -55,10 +55,13 @@ jobs:
     - name: Start backend server
       working-directory: ./backend
       run: |
+        echo "Starting backend on localhost (127.0.0.1) port 5000..."
         npm run dev > backend.log 2>&1 &
         echo $! > backend.pid
+        echo "Backend PID: $(cat backend.pid)"
       env:
         NODE_ENV: test
+        HOST: 0.0.0.0  # Bind to all interfaces to ensure localhost accessibility
 
     # Wait for backend to be fully ready with retry logic
     - name: Wait for backend
@@ -81,10 +84,15 @@ jobs:
     - name: Start frontend server
       working-directory: ./frontend
       run: |
+        echo "Starting frontend on localhost (127.0.0.1) port 3000..."
+        echo "Frontend will proxy API requests to http://localhost:5000"
         npm start > frontend.log 2>&1 &
         echo $! > frontend.pid
+        echo "Frontend PID: $(cat frontend.pid)"
       env:
         CI: true
+        # Ensure frontend uses localhost for backend proxy
+        REACT_APP_API_URL: /api
 
     # Wait for frontend to be fully ready
     - name: Wait for frontend
@@ -107,22 +115,60 @@ jobs:
     # Verify both services are responding without errors
     - name: Verify services are healthy
       run: |
+        echo "=== Network Connectivity Diagnostics ==="
+        echo "All services run on the same GitHub Actions runner (localhost network)"
+        echo ""
+        echo "Backend: http://localhost:5000 (binding to 0.0.0.0:5000)"
+        echo "Frontend: http://localhost:3000 (proxying /api to localhost:5000)"
+        echo ""
         echo "Checking backend health..."
-        curl -f http://localhost:5000/api/tasks || (cat backend/backend.log && exit 1)
+        curl -f http://localhost:5000/api/tasks -v || (echo "❌ Backend health check failed!" && cat backend/backend.log && exit 1)
+        echo "✅ Backend is healthy"
+        echo ""
         echo "Checking frontend health..."
-        curl -f http://localhost:3000 || (cat frontend/frontend.log && exit 1)
-        echo "Both services are healthy!"
+        curl -f http://localhost:3000 -v || (echo "❌ Frontend health check failed!" && cat frontend/frontend.log && exit 1)
+        echo "✅ Frontend is healthy"
+        echo ""
+        echo "Testing frontend-to-backend proxy connectivity..."
+        # The frontend should be serving and should have proxy configured
+        curl -s http://localhost:3000 | grep -q "Task Manager" || (echo "❌ Frontend not serving expected content" && exit 1)
+        echo "✅ Frontend is serving correctly"
+        echo ""
+        echo "Verifying network interfaces..."
+        netstat -tuln | grep -E ':(3000|5000)' || echo "Note: netstat not showing ports (this is normal in some environments)"
+        echo ""
+        echo "✅ All services are healthy and on the same network (localhost)!"
 
     # Run Frontend E2E tests
     - name: Run Frontend E2E tests
       working-directory: ./frontend
-      run: npx playwright test
+      run: |
+        echo "=== Pre-test Network Verification ==="
+        echo "Verifying backend is accessible from test environment..."
+        curl -f http://localhost:5000/api/tasks -s || (echo "ERROR: Backend not accessible!" && exit 1)
+        echo "Backend is accessible ✓"
+        echo ""
+        echo "Verifying frontend is serving..."
+        curl -f http://localhost:3000 -s > /dev/null || (echo "ERROR: Frontend not accessible!" && exit 1)
+        echo "Frontend is accessible ✓"
+        echo ""
+        echo "=== Running Playwright Tests ==="
+        npx playwright test
       continue-on-error: false
+      env:
+        # Ensure consistent network addressing
+        PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
 
     # Run Backend API tests
     - name: Run Backend E2E tests
       working-directory: ./backend
-      run: npx playwright test
+      run: |
+        echo "=== Running Backend API Tests ==="
+        echo "Backend should be accessible at localhost:5000"
+        curl -f http://localhost:5000/api/tasks -s || (echo "ERROR: Backend not accessible for API tests!" && exit 1)
+        echo "Backend is accessible ✓"
+        echo ""
+        npx playwright test
       continue-on-error: false
 
     # Print logs on failure
