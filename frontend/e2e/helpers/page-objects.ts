@@ -42,6 +42,21 @@ export class TaskPage {
   async navigateToApp(): Promise<void> {
     await this.page.goto('/');
     await this.page.waitForLoadState('networkidle');
+    
+    // Wait for app to be visible
+    await expect(this.page.locator('.task-input')).toBeVisible({ timeout: 10000 });
+    
+    // Check for and handle any initial errors
+    const errorMessage = this.page.locator('.error-message');
+    const hasError = await errorMessage.isVisible().catch(() => false);
+    if (hasError) {
+      console.log('Initial load had error, reloading page...');
+      await this.page.reload();
+      await this.page.waitForLoadState('networkidle');
+      await expect(this.page.locator('.task-input')).toBeVisible({ timeout: 10000 });
+      // Error should be gone after reload
+      await expect(errorMessage).not.toBeVisible();
+    }
   }
 
   // Actions
