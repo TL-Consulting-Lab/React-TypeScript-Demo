@@ -70,7 +70,9 @@ jobs:
         for i in {1..40}; do
           if curl -f http://localhost:5000/api/tasks 2>/dev/null; then
             echo "Backend is ready!"
-            sleep 2
+            # Give backend extra time to be fully initialized
+            sleep 5
+            echo "Backend fully initialized!"
             exit 0
           fi
           echo "Attempt $i: Backend not ready yet, waiting..."
@@ -102,7 +104,11 @@ jobs:
           if curl -f http://localhost:3000 2>/dev/null; then
             echo "Frontend is ready!"
             # Give it extra time to fully initialize and connect to backend
-            sleep 5
+            # The frontend makes an immediate fetch on mount, so we need to wait
+            # for that initial request to complete (or fail and retry)
+            echo "Waiting for initial frontend-backend connection to stabilize..."
+            sleep 10
+            echo "Frontend fully initialized!"
             exit 0
           fi
           echo "Attempt $i: Frontend not ready yet, waiting..."
@@ -131,8 +137,19 @@ jobs:
         echo ""
         echo "Testing frontend-to-backend proxy connectivity..."
         # The frontend should be serving and should have proxy configured
-        curl -s http://localhost:3000 | grep -q "Task Manager" || (echo "❌ Frontend not serving expected content" && exit 1)
-        echo "✅ Frontend is serving correctly"
+        FRONTEND_HTML=$(curl -s http://localhost:3000)
+        if echo "$FRONTEND_HTML" | grep -q "Task Manager"; then
+          echo "✅ Frontend is serving correctly"
+        else
+          echo "❌ Frontend not serving expected content"
+          echo "HTML received:"
+          echo "$FRONTEND_HTML" | head -20
+          exit 1
+        fi
+        # Check if there are any visible error messages in the initial render
+        # Note: Initial transient errors during health check are expected as frontend
+        # initializes and retries connection to backend
+        echo "Note: Any initial transient errors during startup are handled by retry logic"
         echo ""
         echo "Testing proxy endpoint directly..."
         # Test that the proxy is working by making a request to the frontend's /api endpoint

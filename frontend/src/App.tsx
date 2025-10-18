@@ -12,7 +12,7 @@ function App() {
   const API_URL = process.env.REACT_APP_API_URL || '/api';
   console.log('API URL:', API_URL); // Add logging
 
-  const fetchTasks = useCallback(async () => {
+  const fetchTasks = useCallback(async (retryCount = 0) => {
     setLoading(true);
     setError(null);
     try {
@@ -23,8 +23,18 @@ function App() {
       const data = await response.json();
       setTasks(data);
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'An error occurred');
       console.error('Error fetching tasks:', error);
+      
+      // Retry logic: retry up to 3 times with exponential backoff
+      // This helps when backend is still initializing
+      if (retryCount < 3) {
+        const delay = Math.min(1000 * Math.pow(2, retryCount), 5000); // max 5 seconds
+        console.log(`Retrying in ${delay}ms... (attempt ${retryCount + 1}/3)`);
+        setTimeout(() => fetchTasks(retryCount + 1), delay);
+      } else {
+        // Only show error after all retries exhausted
+        setError(error instanceof Error ? error.message : 'An error occurred');
+      }
     } finally {
       setLoading(false);
     }
