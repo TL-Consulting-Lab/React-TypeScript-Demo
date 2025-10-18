@@ -28,7 +28,9 @@ function App() {
       // Retry logic: retry up to 3 times with exponential backoff
       // This helps when backend is still initializing
       if (retryCount < 3) {
-        const delay = Math.min(1000 * Math.pow(2, retryCount), 5000); // max 5 seconds
+        // Exponential backoff: delays of 1s, 2s, and 4s for retries 0, 1, and 2 respectively.
+        // The 5-second cap prevents delays from exceeding 5 seconds on subsequent retries.
+        const delay = Math.min(1000 * Math.pow(2, retryCount), 5000);
         console.log(`Retrying in ${delay}ms... (attempt ${retryCount + 1}/3)`);
         setTimeout(() => fetchTasks(retryCount + 1), delay);
       } else {
