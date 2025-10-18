@@ -63,7 +63,7 @@ function App() {
         throw new Error(responseData.error || 'Failed to add task');
       }
       
-      setTasks([...tasks, responseData]);
+      setTasks(prevTasks => [...prevTasks, responseData]);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to add task';
       console.error('Detailed error:', error);
@@ -84,7 +84,7 @@ function App() {
         throw new Error('Failed to toggle task');
       }
       const updatedTask = await response.json();
-      setTasks(tasks.map(task =>
+      setTasks(prevTasks => prevTasks.map(task =>
         task.id === id ? updatedTask : task
       ));
     } catch (error) {
@@ -102,7 +102,7 @@ function App() {
       if (!response.ok) {
         throw new Error('Failed to delete task');
       }
-      setTasks(tasks.filter(task => task.id !== id));
+      setTasks(prevTasks => prevTasks.filter(task => task.id !== id));
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Failed to delete task');
       console.error('Error deleting task:', error);

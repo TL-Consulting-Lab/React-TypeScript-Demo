@@ -60,6 +60,17 @@ app.put('/api/tasks/:id', (req, res) => {
     res.json(task);
 });
 
+// PATCH toggle task completion
+app.patch('/api/tasks/:id', (req, res) => {
+    const id = parseInt(req.params.id, 10);
+    const task = tasks.find(t => t.id === id);
+    if (!task) {
+        return res.status(404).json({ error: 'Task not found' });
+    }
+    task.completed = !task.completed;
+    res.json(task);
+});
+
 // DELETE single task
 app.delete('/api/tasks/:id', (req, res) => {
     const id = parseInt(req.params.id, 10);
@@ -68,7 +79,7 @@ app.delete('/api/tasks/:id', (req, res) => {
         return res.status(404).json({ error: 'Task not found' });
     }
     tasks.splice(index, 1);
-    res.status(200).json({});
+    res.status(200).json({ message: 'Task deleted successfully' });
 });
 
 
