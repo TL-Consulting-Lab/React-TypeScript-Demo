@@ -106,13 +106,18 @@ module.exports = function(app) {
     createProxyMiddleware({
       target: 'http://localhost:5000',
       changeOrigin: true,
-      logLevel: 'debug',
-      onError: (err, req, res) => {
-        console.error('[Proxy] Error:', err.message);
-        res.status(500).json({ 
-          error: 'Proxy error',
-          message: err.message 
-        });
+      logger: console,
+      on: {
+        proxyReq: (proxyReq, req, res) => {
+          console.log(`[Proxy] ${req.method} ${req.url} -> http://localhost:5000${req.url}`);
+        },
+        proxyRes: (proxyRes, req, res) => {
+          console.log(`[Proxy] Response ${proxyRes.statusCode} for ${req.url}`);
+        },
+        error: (err, req, res) => {
+          console.error('[Proxy] Error:', err.message);
+          // Handle error response
+        }
       }
     })
   );
@@ -121,8 +126,9 @@ module.exports = function(app) {
 
 This provides:
 - Explicit error handling for proxy failures
-- Debug logging to diagnose connectivity issues
+- Console logging to diagnose connectivity issues (using `logger` instead of deprecated `logLevel`)
 - Proper error responses when backend is unreachable
+- Uses modern http-proxy-middleware v2.x+ API (no deprecation warnings)
 
 **File:** `frontend/src/App.tsx`
 

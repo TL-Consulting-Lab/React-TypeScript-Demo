@@ -31,25 +31,34 @@ This simple configuration tells `react-scripts` development server to proxy all 
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
 module.exports = function(app) {
+  // Proxy API requests to backend server
+  // Using http-proxy-middleware v2.x+ syntax (no deprecation warnings)
   app.use(
     '/api',
     createProxyMiddleware({
       target: 'http://localhost:5000',
       changeOrigin: true,
-      logLevel: 'debug',
-      onProxyReq: (proxyReq, req, res) => {
-        console.log(`[Proxy] ${req.method} ${req.path} -> http://localhost:5000${req.path}`);
-      },
-      onProxyRes: (proxyRes, req, res) => {
-        console.log(`[Proxy] Response ${proxyRes.statusCode} for ${req.path}`);
-      },
-      onError: (err, req, res) => {
-        console.error('[Proxy] Error:', err.message);
-        res.status(500).json({ 
-          error: 'Proxy error',
-          message: err.message,
-          backend: 'http://localhost:5000'
-        });
+      logger: console,  // Use logger instead of deprecated logLevel
+      on: {
+        proxyReq: (proxyReq, req, res) => {
+          console.log(`[Proxy] ${req.method} ${req.url} -> http://localhost:5000${req.url}`);
+        },
+        proxyRes: (proxyRes, req, res) => {
+          console.log(`[Proxy] Response ${proxyRes.statusCode} for ${req.url}`);
+        },
+        error: (err, req, res) => {
+          console.error('[Proxy] Error:', err.message);
+          if (res.writeHead) {
+            res.writeHead(500, {
+              'Content-Type': 'application/json',
+            });
+          }
+          res.end(JSON.stringify({ 
+            error: 'Proxy error',
+            message: err.message,
+            backend: 'http://localhost:5000'
+          }));
+        }
       }
     })
   );
@@ -58,9 +67,10 @@ module.exports = function(app) {
 
 **Benefits:**
 - ✅ Explicit error handling
-- ✅ Debug logging for troubleshooting
+- ✅ Console logging for troubleshooting (using modern `logger` option)
 - ✅ Better control over proxy behavior
 - ✅ Clear error messages when backend is unreachable
+- ✅ No deprecation warnings (uses http-proxy-middleware v2.x+ API)
 - ✅ Works consistently in all environments (dev, test, CI)
 
 **When to use:**
