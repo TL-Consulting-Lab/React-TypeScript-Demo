@@ -8,83 +8,68 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 exports.app = (0, express_1.default)();
 const port = Number(process.env.PORT) || 5000;
+// Enable CORS and JSON body parsing
 exports.app.use((0, cors_1.default)());
 exports.app.use(express_1.default.json());
 // In-memory storage for tasks
 let tasks = [];
 let nextId = 1;
-// Get all tasks
+// GET all tasks
 exports.app.get('/api/tasks', (req, res) => {
     res.json(tasks);
 });
-// Get a single task by ID
+// GET single task
 exports.app.get('/api/tasks/:id', (req, res) => {
-    const id = parseInt(req.params.id);
-    const task = tasks.find(task => task.id === id);
+    const id = parseInt(req.params.id, 10);
+    const task = tasks.find(t => t.id === id);
     if (!task) {
         return res.status(404).json({ error: 'Task not found' });
     }
     res.json(task);
 });
-// Add a new task
+// POST create task
 exports.app.post('/api/tasks', (req, res) => {
-    console.log('Received request body:', req.body);
     const { title } = req.body;
     if (!title) {
-        console.log('Title is missing');
         return res.status(400).json({ error: 'Title is required' });
     }
-    const newTask = {
-        id: nextId++,
-        title,
-        completed: false,
-        createdAt: new Date()
-    };
+    const newTask = { id: nextId++, title, completed: false, createdAt: new Date() };
     tasks.push(newTask);
-    console.log('Created new task:', newTask);
     res.status(201).json(newTask);
 });
-// Toggle task completion
-exports.app.patch('/api/tasks/:id', (req, res) => {
-    const id = parseInt(req.params.id);
-    const taskIndex = tasks.findIndex(task => task.id === id);
-    if (taskIndex === -1) {
-        return res.status(404).json({ error: 'Task not found' });
-    }
-    tasks[taskIndex].completed = !tasks[taskIndex].completed;
-    res.json(tasks[taskIndex]);
-});
-// Update task (PUT method for full update)
+// PUT update completion
 exports.app.put('/api/tasks/:id', (req, res) => {
-    const id = parseInt(req.params.id);
-    const taskIndex = tasks.findIndex(task => task.id === id);
-    if (taskIndex === -1) {
+    const id = parseInt(req.params.id, 10);
+    const task = tasks.find(t => t.id === id);
+    if (!task) {
         return res.status(404).json({ error: 'Task not found' });
     }
-    const { title, completed } = req.body;
-    if (title !== undefined) {
-        tasks[taskIndex].title = title;
+    const { completed } = req.body;
+    if (typeof completed !== 'boolean') {
+        return res.status(400).json({ error: 'Invalid completed value' });
     }
-    if (completed !== undefined) {
-        tasks[taskIndex].completed = completed;
-    }
-    res.json(tasks[taskIndex]);
+    task.completed = completed;
+    res.json(task);
 });
-// Delete a task
+// PATCH toggle task completion
+exports.app.patch('/api/tasks/:id', (req, res) => {
+    const id = parseInt(req.params.id, 10);
+    const task = tasks.find(t => t.id === id);
+    if (!task) {
+        return res.status(404).json({ error: 'Task not found' });
+    }
+    task.completed = !task.completed;
+    res.json(task);
+});
+// DELETE single task
 exports.app.delete('/api/tasks/:id', (req, res) => {
-    const id = parseInt(req.params.id);
-    const taskIndex = tasks.findIndex(task => task.id === id);
-    if (taskIndex === -1) {
+    const id = parseInt(req.params.id, 10);
+    const index = tasks.findIndex(t => t.id === id);
+    if (index === -1) {
         return res.status(404).json({ error: 'Task not found' });
     }
-    tasks = tasks.filter(task => task.id !== id);
+    tasks.splice(index, 1);
     res.status(200).json({ message: 'Task deleted successfully' });
-});
-// Clear all tasks (for testing purposes)
-exports.app.delete('/api/tasks', (req, res) => {
-    tasks = [];
-    nextId = 1;
-    res.status(200).json({ message: 'All tasks cleared' });
 });
 // Health check endpoint
 exports.app.get('/health', (req, res) => {
