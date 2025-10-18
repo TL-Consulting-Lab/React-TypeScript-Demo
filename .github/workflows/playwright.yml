@@ -134,10 +134,27 @@ jobs:
         curl -s http://localhost:3000 | grep -q "Task Manager" || (echo "❌ Frontend not serving expected content" && exit 1)
         echo "✅ Frontend is serving correctly"
         echo ""
+        echo "Testing proxy endpoint directly..."
+        # Test that the proxy is working by making a request to the frontend's /api endpoint
+        PROXY_RESPONSE=$(curl -s -w "\n%{http_code}" http://localhost:3000/api/tasks)
+        PROXY_CODE=$(echo "$PROXY_RESPONSE" | tail -1)
+        PROXY_BODY=$(echo "$PROXY_RESPONSE" | head -1)
+        if [ "$PROXY_CODE" = "200" ]; then
+          echo "✅ Proxy is working! Response code: $PROXY_CODE"
+          echo "Proxy response: $PROXY_BODY"
+        else
+          echo "❌ Proxy failed! Response code: $PROXY_CODE"
+          echo "Response: $PROXY_BODY"
+          echo "Checking frontend logs for proxy errors..."
+          cat frontend/frontend.log | grep -i proxy || echo "No proxy logs found"
+          exit 1
+        fi
+        echo ""
         echo "Verifying network interfaces..."
         netstat -tuln | grep -E ':(3000|5000)' || echo "Note: netstat not showing ports (this is normal in some environments)"
         echo ""
         echo "✅ All services are healthy and on the same network (localhost)!"
+        echo "✅ Proxy connectivity verified!"
 
     # Run Frontend E2E tests
     - name: Run Frontend E2E tests

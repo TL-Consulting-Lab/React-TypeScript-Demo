@@ -93,6 +93,37 @@ app.listen(port, host, () => {
 - Proxy configuration redirects `/api/*` requests to `http://localhost:5000`
 - This ensures frontend and backend communicate seamlessly
 
+**File:** `frontend/src/setupProxy.js`
+
+For more robust proxy handling, especially in CI environments, a custom proxy setup is configured:
+
+```javascript
+const { createProxyMiddleware } = require('http-proxy-middleware');
+
+module.exports = function(app) {
+  app.use(
+    '/api',
+    createProxyMiddleware({
+      target: 'http://localhost:5000',
+      changeOrigin: true,
+      logLevel: 'debug',
+      onError: (err, req, res) => {
+        console.error('[Proxy] Error:', err.message);
+        res.status(500).json({ 
+          error: 'Proxy error',
+          message: err.message 
+        });
+      }
+    })
+  );
+};
+```
+
+This provides:
+- Explicit error handling for proxy failures
+- Debug logging to diagnose connectivity issues
+- Proper error responses when backend is unreachable
+
 **File:** `frontend/src/App.tsx`
 
 ```typescript
@@ -170,10 +201,17 @@ The CI workflow includes comprehensive network verification:
     echo "Backend: http://localhost:5000"
     echo "Frontend: http://localhost:3000 (proxying /api)"
     
+    # Check backend directly
     curl -f http://localhost:5000/api/tasks -v
+    
+    # Check frontend
     curl -f http://localhost:3000 -v
     
+    # Test proxy connectivity
+    curl -s -w "\n%{http_code}" http://localhost:3000/api/tasks
+    
     echo "All services on the same network (localhost)!"
+    echo "Proxy connectivity verified!"
 ```
 
 ### 6. Pre-Test Verification
