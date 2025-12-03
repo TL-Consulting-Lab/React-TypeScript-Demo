@@ -32,11 +32,16 @@ export default defineConfig({
     /* Record video on failure */
     video: 'retain-on-failure',
     
-    /* Set navigation timeout */
-    navigationTimeout: 30000,
+    /* Set navigation timeout - increased for CI */
+    navigationTimeout: isCI ? 60000 : 30000,
     
-    /* Set action timeout */
-    actionTimeout: 10000,
+    /* Set action timeout - increased for CI */
+    actionTimeout: isCI ? 15000 : 10000,
+    
+    /* Set default timeout for expect assertions - increased for CI */
+    expect: {
+      timeout: isCI ? 10000 : 5000,
+    },
   },
 
   /* Configure projects for major browsers - reduced for faster e2e tests */

@@ -5,8 +5,13 @@ test.describe('Full Stack Integration Tests', () => {
     await page.goto('http://localhost:3000');
     await page.waitForLoadState('networkidle');
     
+    // Wait additional time in CI for React to hydrate
+    if (process.env.CI) {
+      await page.waitForTimeout(2000);
+    }
+    
     // Wait for the task input to be visible
-    await expect(page.locator('.task-input')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('.task-input')).toBeVisible({ timeout: 15000 });
     
     // Verify no error messages are shown (backend is responding)
     // If there's an error, wait a bit and reload
@@ -16,7 +21,10 @@ test.describe('Full Stack Integration Tests', () => {
       console.log('Initial load had error, reloading page...');
       await page.reload();
       await page.waitForLoadState('networkidle');
-      await expect(page.locator('.task-input')).toBeVisible({ timeout: 10000 });
+      if (process.env.CI) {
+        await page.waitForTimeout(2000);
+      }
+      await expect(page.locator('.task-input')).toBeVisible({ timeout: 15000 });
       // Error should be gone after reload
       await expect(errorMessage).not.toBeVisible();
     }

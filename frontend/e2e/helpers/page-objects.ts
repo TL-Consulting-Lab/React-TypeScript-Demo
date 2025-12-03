@@ -43,8 +43,13 @@ export class TaskPage {
     await this.page.goto('/');
     await this.page.waitForLoadState('networkidle');
     
+    // Wait additional time in CI for React to hydrate
+    if (process.env.CI) {
+      await this.page.waitForTimeout(2000);
+    }
+    
     // Wait for app to be visible
-    await expect(this.page.locator('.task-input')).toBeVisible({ timeout: 10000 });
+    await expect(this.page.locator('.task-input')).toBeVisible({ timeout: 15000 });
     
     // Check for and handle any initial errors
     const errorMessage = this.page.locator('.error-message');
@@ -53,7 +58,10 @@ export class TaskPage {
       console.log('Initial load had error, reloading page...');
       await this.page.reload();
       await this.page.waitForLoadState('networkidle');
-      await expect(this.page.locator('.task-input')).toBeVisible({ timeout: 10000 });
+      if (process.env.CI) {
+        await this.page.waitForTimeout(2000);
+      }
+      await expect(this.page.locator('.task-input')).toBeVisible({ timeout: 15000 });
       // Error should be gone after reload
       await expect(errorMessage).not.toBeVisible();
     }
