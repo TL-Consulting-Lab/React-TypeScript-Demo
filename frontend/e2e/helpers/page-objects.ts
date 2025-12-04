@@ -43,9 +43,9 @@ export class TaskPage {
     await this.page.goto('/');
     await this.page.waitForLoadState('networkidle');
     
-    // Wait additional time in CI for React to hydrate
+    // In CI, wait for DOM to be fully loaded and interactive
     if (process.env.CI) {
-      await this.page.waitForTimeout(2000);
+      await this.page.waitForLoadState('domcontentloaded');
     }
     
     // Wait for app to be visible
@@ -59,7 +59,7 @@ export class TaskPage {
       await this.page.reload();
       await this.page.waitForLoadState('networkidle');
       if (process.env.CI) {
-        await this.page.waitForTimeout(2000);
+        await this.page.waitForLoadState('domcontentloaded');
       }
       await expect(this.page.locator('.task-input')).toBeVisible({ timeout: 15000 });
       // Error should be gone after reload
@@ -71,21 +71,24 @@ export class TaskPage {
   async addTask(title: string): Promise<void> {
     await this.taskInput.fill(title);
     await this.addButton.click();
-    await this.page.waitForTimeout(500);
+    // Wait for the task to appear in the list
+    await expect(this.page.locator('.task-item__title', { hasText: title })).toBeVisible({ timeout: 5000 });
   }
 
   async toggleTask(title: string): Promise<void> {
     const checkbox = this.taskCheckbox(title);
     await checkbox.waitFor({ state: 'visible' });
     await checkbox.click();
-    await this.page.waitForTimeout(300);
+    // Wait for the checkbox state to update
+    await expect(checkbox).toBeChecked({ timeout: 3000 });
   }
 
   async deleteTask(title: string): Promise<void> {
     const deleteButton = this.taskDeleteButton(title);
     await deleteButton.waitFor({ state: 'visible' });
     await deleteButton.click();
-    await this.page.waitForTimeout(300);
+    // Wait for the task to be removed from the list
+    await expect(this.taskItem(title)).not.toBeVisible({ timeout: 3000 });
   }
 
   async clearInput(): Promise<void> {
@@ -250,7 +253,8 @@ export const TestData = {
 // Utility functions
 export const Utils = {
   async waitForApiCall(page: Page, timeout = 1000): Promise<void> {
-    await page.waitForTimeout(timeout);
+    // Wait for network to be idle instead of arbitrary timeout
+    await page.waitForLoadState('networkidle', { timeout });
   },
 
   async clearAllTasks(page: Page): Promise<void> {

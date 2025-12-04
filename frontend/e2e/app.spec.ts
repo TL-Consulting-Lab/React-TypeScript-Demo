@@ -8,9 +8,9 @@ test.describe('Task Management App - Critical User Flows', () => {
     // Wait for the app to be fully loaded
     await page.waitForLoadState('networkidle');
     
-    // Wait additional time in CI for React to hydrate
+    // In CI, wait for DOM to be fully loaded and interactive
     if (process.env.CI) {
-      await page.waitForTimeout(2000);
+      await page.waitForLoadState('domcontentloaded');
     }
     
     // Wait for the task input to be visible (app is loaded)
@@ -25,7 +25,7 @@ test.describe('Task Management App - Critical User Flows', () => {
       await page.reload();
       await page.waitForLoadState('networkidle');
       if (process.env.CI) {
-        await page.waitForTimeout(2000);
+        await page.waitForLoadState('domcontentloaded');
       }
       await expect(page.locator('.task-input')).toBeVisible({ timeout: 15000 });
       // Error should be gone after reload
@@ -80,7 +80,8 @@ test.describe('Task Management App - Critical User Flows', () => {
     // Test 1: Should not add empty task
     const initialTaskCount = await page.locator('.task-item').count();
     await addButton.click();
-    await page.waitForTimeout(500);
+    // Wait for any potential task to appear (should not happen)
+    await page.waitForLoadState('networkidle');
     const afterEmptyCount = await page.locator('.task-item').count();
     expect(afterEmptyCount).toBe(initialTaskCount);
     

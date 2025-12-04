@@ -5,9 +5,9 @@ test.describe('Full Stack Integration Tests', () => {
     await page.goto('http://localhost:3000');
     await page.waitForLoadState('networkidle');
     
-    // Wait additional time in CI for React to hydrate
+    // In CI, wait for DOM to be fully loaded and interactive
     if (process.env.CI) {
-      await page.waitForTimeout(2000);
+      await page.waitForLoadState('domcontentloaded');
     }
     
     // Wait for the task input to be visible
@@ -22,7 +22,7 @@ test.describe('Full Stack Integration Tests', () => {
       await page.reload();
       await page.waitForLoadState('networkidle');
       if (process.env.CI) {
-        await page.waitForTimeout(2000);
+        await page.waitForLoadState('domcontentloaded');
       }
       await expect(page.locator('.task-input')).toBeVisible({ timeout: 15000 });
       // Error should be gone after reload
@@ -117,7 +117,9 @@ test.describe('Full Stack Integration Tests', () => {
     // Attempt to add task (should fail gracefully)
     await page.locator('.task-input__field').fill('Task that should fail');
     await page.locator('.task-input__button').click();
-    await page.waitForTimeout(1000);
+    
+    // Wait for network to settle after failed request
+    await page.waitForLoadState('networkidle');
 
     // Remove interception for cleanup
     await page.unroute('**/api/tasks');
