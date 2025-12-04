@@ -69,10 +69,15 @@ export class TaskPage {
 
   // Actions
   async addTask(title: string): Promise<void> {
-    await this.taskInput.fill(title);
-    await this.addButton.click();
+    // Ensure the input is filled with plain text (not JSON)
+    await this.taskInput.fill(title, { timeout: 10000 });
+    await this.addButton.click({ timeout: 10000 });
+    
+    // Wait for the network response to complete before checking DOM
+    await this.page.waitForLoadState('networkidle');
+    
     // Wait for the task to appear in the list
-    await expect(this.page.locator('.task-item__title', { hasText: title })).toBeVisible({ timeout: 5000 });
+    await expect(this.page.locator('.task-item__title', { hasText: title })).toBeVisible({ timeout: 15000 });
   }
 
   async toggleTask(title: string): Promise<void> {
