@@ -64,20 +64,24 @@ export default defineConfig({
   /* IMPORTANT: Backend MUST start before frontend to prevent "Failed to fetch" errors.
      When using an array, Playwright waits for each server sequentially in order.
      The backend is checked at /api/tasks endpoint to ensure it's fully ready. */
-  webServer: isCI ? undefined : [
+  webServer: [
     {
       command: 'cd ../backend && npm run dev',
       url: 'http://localhost:5000/api/tasks',
-      reuseExistingServer: true,
+      reuseExistingServer: !isCI, // In CI, always start fresh servers
       timeout: 120 * 1000,
       // Wait for backend to be fully responsive
+      stdout: 'pipe',
+      stderr: 'pipe',
     },
     {
       command: 'npm start',
       url: 'http://localhost:3000',
-      reuseExistingServer: true,
+      reuseExistingServer: !isCI, // In CI, always start fresh servers
       timeout: 180 * 1000,
       // Frontend starts only after backend is ready
+      stdout: 'pipe',
+      stderr: 'pipe',
     },
   ],
 });
