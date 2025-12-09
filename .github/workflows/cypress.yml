@@ -1,0 +1,150 @@
+name: Cypress E2E Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  cypress-run:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: |
+            frontend/package-lock.json
+            backend/package-lock.json
+
+      # Install backend dependencies
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      # Install frontend dependencies
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      # Build backend
+      - name: Build backend
+        working-directory: ./backend
+        run: npm run build
+
+      # Run backend tests (Jest)
+      - name: Run backend unit tests
+        working-directory: ./backend
+        run: npm test
+
+      # Run frontend tests (Jest)
+      - name: Run frontend unit tests
+        working-directory: ./frontend
+        run: npm test -- --coverage --watchAll=false
+
+      # Start backend server in background
+      - name: Start backend server
+        working-directory: ./backend
+        run: |
+          echo "Starting backend server..."
+          npm run dev > backend.log 2>&1 &
+          echo $! > backend.pid
+          echo "Backend PID: $(cat backend.pid)"
+        env:
+          NODE_ENV: test
+          HOST: 0.0.0.0
+
+      # Wait for backend to be ready
+      - name: Wait for backend
+        run: |
+          echo "Waiting for backend to be ready..."
+          for i in {1..30}; do
+            if curl -f --connect-timeout 5 --max-time 10 http://localhost:5000/api/tasks 2>/dev/null; then
+              echo "Backend is ready!"
+              sleep 2
+              exit 0
+            fi
+            echo "Attempt $i: Backend not ready yet, waiting..."
+            sleep 2
+          done
+          echo "Backend failed to start!"
+          cat backend/backend.log || true
+          exit 1
+
+      # Start frontend server in background
+      - name: Start frontend server
+        working-directory: ./frontend
+        run: |
+          echo "Starting frontend server..."
+          npm start > frontend.log 2>&1 &
+          echo $! > frontend.pid
+          echo "Frontend PID: $(cat frontend.pid)"
+        env:
+          CI: true
+          REACT_APP_API_URL: /api
+
+      # Wait for frontend to be ready
+      - name: Wait for frontend
+        run: |
+          echo "Waiting for frontend to be ready..."
+          for i in {1..40}; do
+            if curl -f --connect-timeout 5 --max-time 10 http://localhost:3000 2>/dev/null; then
+              echo "Frontend is ready!"
+              sleep 3
+              exit 0
+            fi
+            echo "Attempt $i: Frontend not ready yet, waiting..."
+            sleep 3
+          done
+          echo "Frontend failed to start!"
+          cat frontend/frontend.log || true
+          exit 1
+
+      # Run Cypress E2E tests
+      - name: Run Cypress E2E tests
+        uses: cypress-io/github-action@v6
+        with:
+          working-directory: ./frontend
+          browser: chrome
+          wait-on: 'http://localhost:3000, http://localhost:5000/api/tasks'
+          wait-on-timeout: 120
+          install: false
+          # Record to Cypress Dashboard (optional - requires CYPRESS_RECORD_KEY)
+          # record: true
+        env:
+          CYPRESS_BASE_URL: http://localhost:3000
+          CI: true
+
+      # Upload Cypress screenshots on failure
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: frontend/cypress/screenshots
+          retention-days: 30
+
+      # Upload Cypress videos
+      - name: Upload videos
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cypress-videos
+          path: frontend/cypress/videos
+          retention-days: 30
+
+      # Print logs on failure
+      - name: Print server logs on failure
+        if: failure()
+        run: |
+          echo "=== Backend Logs ==="
+          cat backend/backend.log || echo "No backend logs"
+          echo ""
+          echo "=== Frontend Logs ==="
+          cat frontend/frontend.log || echo "No frontend logs"
