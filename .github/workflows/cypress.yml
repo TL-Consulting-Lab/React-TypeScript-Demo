@@ -106,6 +106,31 @@ jobs:
           cat frontend/frontend.log || true
           exit 1
 
+      # Verify both servers are healthy before running tests
+      - name: Verify servers are running
+        run: |
+          echo "=== Verifying Backend ===" 
+          if ! curl -f --connect-timeout 5 --max-time 10 http://localhost:5000/api/tasks; then
+            echo "ERROR: Backend is not responding!"
+            cat backend/backend.log || true
+            ps aux | grep -i "node\|ts-node" || true
+            exit 1
+          fi
+          echo "✓ Backend is healthy"
+          
+          echo ""
+          echo "=== Verifying Frontend ==="
+          if ! curl -f --connect-timeout 5 --max-time 10 http://localhost:3000; then
+            echo "ERROR: Frontend is not responding!"
+            cat frontend/frontend.log || true
+            ps aux | grep -i "node\|react-scripts" || true
+            exit 1
+          fi
+          echo "✓ Frontend is healthy"
+          
+          echo ""
+          echo "=== Both servers are ready for testing ==="
+
       # Run Cypress E2E tests
       - name: Run Cypress E2E tests
         uses: cypress-io/github-action@v6

@@ -5,7 +5,7 @@ export default defineConfig({
     baseUrl: 'http://localhost:3000',
     supportFile: 'cypress/support/e2e.ts',
     specPattern: 'cypress/e2e/**/*.cy.ts',
-    video: false,
+    video: true,  // Enable videos for CI debugging
     screenshotOnRunFailure: true,
     viewportWidth: 1280,
     viewportHeight: 720,
@@ -18,9 +18,13 @@ export default defineConfig({
     
     // Retry configuration
     retries: {
-      runMode: 2,  // CI mode
-      openMode: 0, // Local development
+      runMode: 2,  // CI mode - retry failed tests
+      openMode: 0, // Local development - no retries
     },
+    
+    // Wait for stability before executing commands
+    waitForAnimations: true,
+    animationDistanceThreshold: 5,
     
     setupNodeEvents(on, config) {
       // implement node event listeners here
