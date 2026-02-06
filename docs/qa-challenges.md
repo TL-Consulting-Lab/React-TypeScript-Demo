@@ -10,6 +10,23 @@
 
 This document contains quality assurance challenges designed to test your skills with GitHub Copilot in creating comprehensive test suites and quality assurance processes.
 
+<div style="background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #2E7D32;">
+
+### 💡 **Best Practices for QA Challenges**
+
+- 📂 **Keep relevant files open** - Source code, existing tests, challenge specs
+- 🔄 **Iterate test prompts** - Refine based on coverage and edge case discovery
+- 🎯 **Clear, specific test requirements** - Define exact testing scenarios and criteria
+- 🧠 **Context management** - Include application behavior and business rules
+- 💬 **Use descriptive test comments** - Describe expected behaviors and edge cases
+- ⚙️ **Specify QA frameworks** - Jest, React Testing Library, Playwright, JMeter
+- ⌨️ **Leverage keyboard shortcuts** - Tab, Alt+], Esc for efficient test creation
+- ✅ **Review and validate tests** - Run tests and verify coverage metrics
+- 🛠️ **Break down test scenarios** - Separate unit, integration, and e2e tests
+- 📊 **Request comprehensive coverage** - Aim for high coverage with quality assertions
+
+</div>
+
 <details>
 <summary>📋 <strong>Quick Navigation</strong></summary>
 
@@ -66,15 +83,17 @@ Create edge case tests for task management endpoints
 - Create tests for user interactions (clicks, form submissions)
 - Implement accessibility testing for components
 
-<div style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); padding: 15px; border-radius: 8px; margin: 10px 0;">
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 15px; border-radius: 8px; margin: 10px 0;">
 
 **🤖 Copilot Prompts to Use**:
 ```
 Generate React Testing Library tests for form components
 ```
 ```
-Create accessibility tests for task management components
+Create accessibility tests for task management components using inline code completion
 ```
+
+**⌨️ Quick Shortcuts**: `Tab` (accept) • `Alt+]` (cycle options) • `Esc` (reject) • `Ctrl+→` (accept word)
 
 </div>
 

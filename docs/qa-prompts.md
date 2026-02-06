@@ -80,7 +80,33 @@ Write unit tests using Jest for the Add Task feature in the backend, targeting a
 
 ---
 
-## 🎨 2. Frontend Component Integration Test Prompts (React Component)
+## 🚀 2. Template Generation for Tests using Inline Code Completion
+
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 10px; margin: 10px 0;">
+
+### ⌨️ **Quick Shortcuts**: `Tab` (accept) • `Alt+]` (cycle options) • `Esc` (reject) • `Ctrl+→` (accept word)
+
+Use descriptive comments to trigger comprehensive test templates:
+
+```javascript
+// Complete test suite for user authentication
+// → Tab generates full test structure with setup, teardown, and test cases
+
+// API integration tests with error handling
+// → Tab creates comprehensive API test patterns
+
+// Frontend component tests with user interactions
+// → Tab generates React Testing Library patterns
+
+// Performance tests for database queries
+// → Tab creates load testing boilerplate
+```
+
+</div>
+
+---
+
+## 🎨 3. Frontend Component Integration Test Prompts (React Component)
 
 ### 📝 Add Task Form
 
@@ -123,7 +149,7 @@ Write tests to validate rendering and interactions:
 
 ---
 
-## 📊 3. Test Coverage Analysis
+## 📊 4. Test Coverage Analysis
 
 ### 🔍 Coverage Gap Analysis
 
@@ -208,7 +234,7 @@ Help me write performance tests for the task API using JMeter
 
 ---
 
-## 🔧 4. App Component Integration Test Prompts
+## 🔧 5. App Component Integration Test Prompts
 
 <div style="background: #1A365D; color: white; padding: 15px; border-radius: 8px; margin: 10px 0; border-left: 4px solid #2B6CB0;">
 
@@ -238,7 +264,7 @@ Submits form and validates:
 
 ---
 
-## 🌐 5. Backend API Integration Test Prompts
+## 🌐 6. Backend API Integration Test Prompts
 
 <div style="background: #8B2635; color: white; padding: 15px; border-radius: 8px; margin: 10px 0; border-left: 4px solid #E53E3E;">
 
@@ -322,4 +348,4 @@ Got questions about testing? Need help with QA strategies? The GitHub Copilot co
 ![GitHub Copilot](https://img.shields.io/badge/Powered_by-GitHub_Copilot-7C3AED?style=for-the-badge&logo=github&logoColor=white)
 ![Testing](https://img.shields.io/badge/QA-Ready-4CAF50?style=for-the-badge&logo=check-circle&logoColor=white)
 
-</div> 
+</div>

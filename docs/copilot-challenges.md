@@ -2,6 +2,23 @@
 
 This document contains a series of challenges designed to help you explore and master GitHub Copilot's capabilities while working with the React-TypeScript Task Manager application.
 
+<div style="background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #2E7D32;">
+
+### 💡 **Best Practices for Copilot Challenges**
+
+- 📂 **Keep relevant files open** - Challenge requirements, existing code, tests
+- 🔄 **Iterate prompts** - Refine requests based on challenge feedback
+- 🎯 **Clear, specific prompts** - Define exact requirements and constraints
+- 🧠 **Context management** - Reference existing functionality and patterns
+- 💬 **Use descriptive comments** - Start with comments describing your approach
+- ⚙️ **Specify challenge context** - Mention React, TypeScript, task management domain
+- ⌨️ **Leverage keyboard shortcuts** - Tab, Alt+], Esc for rapid development
+- ✅ **Review and validate output** - Test solutions thoroughly
+- 🛠️ **Break down challenges** - Tackle complex features step by step
+- 📋 **Include comprehensive testing** - Generate tests alongside implementations
+
+</div>
+
 ## Getting Started
 
 Before beginning these challenges, ensure you have:
@@ -176,25 +193,24 @@ What is your CI/CD workflow? Outline or diagram the process you would implement.
 
 ---
 
-### 🧪 Testing Challenges
+## 🎨 Component Generation with Inline Code Completion
 
-#### Challenge: E2E Testing
-**Objective**: Create end-to-end tests using Playwright with Copilot assistance.
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 15px; border-radius: 8px; margin: 10px 0;">
 
-**Tasks**:
-- Write user journey tests
-- Create page object models
-- Implement visual regression tests
+### � **Ready-to-Use Prompt:**
+```
+// React component for user profile using inline code completion
+```
 
----
+**⌨️ Quick Shortcuts**: `Tab` (accept) • `Alt+]` (cycle options) • `Esc` (reject) • `Ctrl+→` (accept word)
 
-#### Challenge : API Testing
-**Objective**: Comprehensive API testing with various scenarios.
+### 💡 **Pro Tips for Challenges**
+- Start with descriptive comments before coding
+- Use `Alt+]` to explore multiple solution approaches
+- Leverage template generation for complex patterns
+- Combine shortcuts for rapid development workflow
 
-**Tasks**:
-- Test all CRUD operations
-- Validate error responses
-- Test edge cases and boundary conditions
+</div>
 
 ---
 

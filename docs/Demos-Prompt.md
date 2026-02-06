@@ -168,6 +168,21 @@ Add a feature to Edit existing task
 
 ---
 
+### 🎨 **4. Component Generation with Inline Code Completion**
+
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 15px; border-radius: 8px; margin: 10px 0;">
+
+#### 💬 **Ready-to-Use Prompt:**
+```
+// React component for user profile using inline code completion
+```
+
+**⌨️ Quick Shortcuts**: `Tab` (accept) • `Alt+]` (cycle options) • `Esc` (reject) • `Ctrl+→` (accept word)
+
+</div>
+
+---
+
 ## 🧪 Testing & QA
 
 <div align="center">
@@ -180,12 +195,12 @@ Add a feature to Edit existing task
 
 #### 🧪 **Generate Category Tests**
 ```copilot
-Generate unit tests for add task categories
+Generate unit tests using Jest for add task categories
 ```
 
 #### 🔧 **Full Stack Testing**
 ```copilot
-Generate unit test for Frontend components and backend API endpoints
+Generate unit test using Jest and React Testing Library for Frontend components and backend API endpoints
 ```
 
 </div>
