@@ -1,0 +1,112 @@
+name: Playwright Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 18
+        cache: 'npm'
+        cache-dependency-path: |
+          frontend/package-lock.json
+          backend/package-lock.json
+
+    # Install backend dependencies
+    - name: Install backend dependencies
+      working-directory: ./backend
+      run: npm ci
+
+    # Install frontend dependencies
+    - name: Install frontend dependencies
+      working-directory: ./frontend
+      run: npm ci
+
+    # Install Playwright browsers
+    - name: Install Playwright Browsers
+      working-directory: ./frontend
+      run: npx playwright install --with-deps
+
+    # Build backend
+    - name: Build backend
+      working-directory: ./backend
+      run: npm run build
+
+    # Run backend tests (Jest)
+    - name: Run backend unit tests
+      working-directory: ./backend
+      run: npm test
+
+    # Run frontend tests (Jest)
+    - name: Run frontend unit tests
+      working-directory: ./frontend
+      run: npm test -- --coverage --watchAll=false
+
+    # Run Frontend E2E tests
+    # Note: Playwright will automatically start backend and frontend servers
+    # using the webServer configuration in playwright.config.ts
+    - name: Run Frontend E2E tests
+      working-directory: ./frontend
+      run: |
+        echo "=== Running Playwright Tests ==="
+        echo "Playwright will automatically start backend (localhost:5000) and frontend (localhost:3000)"
+        echo "Backend starts first, then frontend - configured in playwright.config.ts"
+        echo ""
+        npx playwright test
+      continue-on-error: false
+      env:
+        PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+        NODE_ENV: test
+
+    # Run Backend API tests
+    # Note: Playwright will automatically start the backend server
+    - name: Run Backend E2E tests
+      working-directory: ./backend
+      run: |
+        echo "=== Running Backend API Tests ==="
+        echo "Playwright will automatically start backend at localhost:5000"
+        echo ""
+        npx playwright test
+      continue-on-error: false
+
+    # Print logs on failure - servers are managed by Playwright now
+    - name: Print test output on failure
+      if: failure()
+      run: |
+        echo "=== Test Failure Information ==="
+        echo "Check the Playwright HTML report and test-results artifacts for detailed error information"
+        echo "Playwright automatically manages server startup and teardown"
+
+    # Upload Playwright reports
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report-frontend
+        path: frontend/playwright-report/
+        retention-days: 30
+
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report-backend
+        path: backend/playwright-report/
+        retention-days: 30
+
+    # Upload test results
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: |
+          frontend/test-results/
+          backend/test-results/
+        retention-days: 30

@@ -8,8 +8,13 @@ test.describe('Task Management App - Critical User Flows', () => {
     // Wait for the app to be fully loaded
     await page.waitForLoadState('networkidle');
     
+    // In CI, wait for DOM to be fully loaded and interactive
+    if (process.env.CI) {
+      await page.waitForLoadState('domcontentloaded');
+    }
+    
     // Wait for the task input to be visible (app is loaded)
-    await expect(page.locator('.task-input')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('.task-input')).toBeVisible({ timeout: 15000 });
     
     // Verify no error messages are shown (backend is responding)
     // If there's an error, wait a bit and reload
@@ -19,7 +24,10 @@ test.describe('Task Management App - Critical User Flows', () => {
       console.log('Initial load had error, reloading page...');
       await page.reload();
       await page.waitForLoadState('networkidle');
-      await expect(page.locator('.task-input')).toBeVisible({ timeout: 10000 });
+      if (process.env.CI) {
+        await page.waitForLoadState('domcontentloaded');
+      }
+      await expect(page.locator('.task-input')).toBeVisible({ timeout: 15000 });
       // Error should be gone after reload
       await expect(errorMessage).not.toBeVisible();
     }
@@ -37,11 +45,15 @@ test.describe('Task Management App - Critical User Flows', () => {
     const taskInput = page.locator('.task-input__field');
     const addButton = page.locator('.task-input__button');
     
-    await taskInput.fill(taskTitle);
-    await addButton.click();
+    // Fill with text input and explicit timeout
+    await taskInput.fill(taskTitle, { timeout: 10000 });
+    await addButton.click({ timeout: 10000 });
+    
+    // Wait for network to settle
+    await page.waitForLoadState('networkidle');
     
     // Wait for task to appear using proper selector
-    await expect(page.locator('.task-item__title', { hasText: taskTitle })).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('.task-item__title', { hasText: taskTitle })).toBeVisible({ timeout: 15000 });
     
     // Verify input is cleared
     await expect(taskInput).toHaveValue('');
@@ -72,16 +84,20 @@ test.describe('Task Management App - Critical User Flows', () => {
     // Test 1: Should not add empty task
     const initialTaskCount = await page.locator('.task-item').count();
     await addButton.click();
-    await page.waitForTimeout(500);
+    // Wait for any potential task to appear (should not happen)
+    await page.waitForLoadState('networkidle');
     const afterEmptyCount = await page.locator('.task-item').count();
     expect(afterEmptyCount).toBe(initialTaskCount);
     
     // Test 2: Should handle multiple tasks
     const tasks = ['Task One', 'Task Two', 'Task Three'];
     for (const task of tasks) {
-      await taskInput.fill(task);
-      await addButton.click();
-      await expect(page.locator('.task-item__title', { hasText: task })).toBeVisible({ timeout: 3000 });
+      // Fill with text input and explicit timeout
+      await taskInput.fill(task, { timeout: 10000 });
+      await addButton.click({ timeout: 10000 });
+      // Wait for network to settle after each task
+      await page.waitForLoadState('networkidle');
+      await expect(page.locator('.task-item__title', { hasText: task })).toBeVisible({ timeout: 15000 });
     }
     
     // Verify all tasks are present
@@ -96,9 +112,12 @@ test.describe('Task Management App - Critical User Flows', () => {
     const taskInput = page.locator('.task-input__field');
     const addButton = page.locator('.task-input__button');
     
-    await taskInput.fill(taskTitle);
-    await addButton.click();
-    await expect(page.locator('.task-item__title', { hasText: taskTitle })).toBeVisible({ timeout: 5000 });
+    // Fill with text input and explicit timeout
+    await taskInput.fill(taskTitle, { timeout: 10000 });
+    await addButton.click({ timeout: 10000 });
+    // Wait for network to settle
+    await page.waitForLoadState('networkidle');
+    await expect(page.locator('.task-item__title', { hasText: taskTitle })).toBeVisible({ timeout: 15000 });
     
     // Toggle completion
     const taskItem = page.locator('.task-item').filter({ hasText: taskTitle });

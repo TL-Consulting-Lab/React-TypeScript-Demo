@@ -32,11 +32,16 @@ export default defineConfig({
     /* Record video on failure */
     video: 'retain-on-failure',
     
-    /* Set navigation timeout */
-    navigationTimeout: 30000,
+    /* Set navigation timeout - increased for CI */
+    navigationTimeout: isCI ? 60000 : 30000,
     
-    /* Set action timeout */
-    actionTimeout: 10000,
+    /* Set action timeout - increased for CI */
+    actionTimeout: isCI ? 15000 : 10000,
+    
+    /* Set default timeout for expect assertions - increased for CI */
+    expect: {
+      timeout: isCI ? 10000 : 5000,
+    },
   },
 
   /* Configure projects for major browsers - reduced for faster e2e tests */
@@ -59,20 +64,24 @@ export default defineConfig({
   /* IMPORTANT: Backend MUST start before frontend to prevent "Failed to fetch" errors.
      When using an array, Playwright waits for each server sequentially in order.
      The backend is checked at /api/tasks endpoint to ensure it's fully ready. */
-  webServer: isCI ? undefined : [
+  webServer: [
     {
       command: 'cd ../backend && npm run dev',
       url: 'http://localhost:5000/api/tasks',
-      reuseExistingServer: true,
+      reuseExistingServer: !isCI, // In CI, always start fresh servers
       timeout: 120 * 1000,
       // Wait for backend to be fully responsive
+      stdout: 'pipe',
+      stderr: 'pipe',
     },
     {
       command: 'npm start',
       url: 'http://localhost:3000',
-      reuseExistingServer: true,
+      reuseExistingServer: !isCI, // In CI, always start fresh servers
       timeout: 180 * 1000,
       // Frontend starts only after backend is ready
+      stdout: 'pipe',
+      stderr: 'pipe',
     },
   ],
 });

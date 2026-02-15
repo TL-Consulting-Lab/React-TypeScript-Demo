@@ -5,8 +5,13 @@ test.describe('Full Stack Integration Tests', () => {
     await page.goto('http://localhost:3000');
     await page.waitForLoadState('networkidle');
     
+    // In CI, wait for DOM to be fully loaded and interactive
+    if (process.env.CI) {
+      await page.waitForLoadState('domcontentloaded');
+    }
+    
     // Wait for the task input to be visible
-    await expect(page.locator('.task-input')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('.task-input')).toBeVisible({ timeout: 15000 });
     
     // Verify no error messages are shown (backend is responding)
     // If there's an error, wait a bit and reload
@@ -16,7 +21,10 @@ test.describe('Full Stack Integration Tests', () => {
       console.log('Initial load had error, reloading page...');
       await page.reload();
       await page.waitForLoadState('networkidle');
-      await expect(page.locator('.task-input')).toBeVisible({ timeout: 10000 });
+      if (process.env.CI) {
+        await page.waitForLoadState('domcontentloaded');
+      }
+      await expect(page.locator('.task-input')).toBeVisible({ timeout: 15000 });
       // Error should be gone after reload
       await expect(errorMessage).not.toBeVisible();
     }
@@ -27,13 +35,16 @@ test.describe('Full Stack Integration Tests', () => {
     const taskInput = page.locator('.task-input__field');
     const addButton = page.locator('.task-input__button');
 
-    // Add task through UI
-    await taskInput.fill(taskTitle);
-    await addButton.click();
+    // Add task through UI with explicit text input and timeout
+    await taskInput.fill(taskTitle, { timeout: 10000 });
+    await addButton.click({ timeout: 10000 });
+    
+    // Wait for network to settle
+    await page.waitForLoadState('networkidle');
 
     // Verify task appears in UI
     const taskItem = page.locator('.task-item').filter({ hasText: taskTitle });
-    await expect(taskItem).toBeVisible({ timeout: 5000 });
+    await expect(taskItem).toBeVisible({ timeout: 15000 });
 
     // Verify task was created in backend
     const apiResponse = await page.request.get('http://localhost:5000/api/tasks');
@@ -69,10 +80,12 @@ test.describe('Full Stack Integration Tests', () => {
   test('Data persistence across page refresh', async ({ page }) => {
     const taskTitle = 'Persistent Integration Task';
     
-    // Create and complete task
-    await page.locator('.task-input__field').fill(taskTitle);
-    await page.locator('.task-input__button').click();
-    await expect(page.locator('.task-item__title', { hasText: taskTitle })).toBeVisible({ timeout: 5000 });
+    // Create and complete task with explicit text input and timeout
+    await page.locator('.task-input__field').fill(taskTitle, { timeout: 10000 });
+    await page.locator('.task-input__button').click({ timeout: 10000 });
+    // Wait for network to settle
+    await page.waitForLoadState('networkidle');
+    await expect(page.locator('.task-item__title', { hasText: taskTitle })).toBeVisible({ timeout: 15000 });
     
     const taskItem = page.locator('.task-item').filter({ hasText: taskTitle });
     await taskItem.locator('.task-item__checkbox').click();
@@ -106,10 +119,12 @@ test.describe('Full Stack Integration Tests', () => {
       }
     });
 
-    // Attempt to add task (should fail gracefully)
-    await page.locator('.task-input__field').fill('Task that should fail');
-    await page.locator('.task-input__button').click();
-    await page.waitForTimeout(1000);
+    // Attempt to add task (should fail gracefully) with explicit text input and timeout
+    await page.locator('.task-input__field').fill('Task that should fail', { timeout: 10000 });
+    await page.locator('.task-input__button').click({ timeout: 10000 });
+    
+    // Wait for network to settle after failed request
+    await page.waitForLoadState('networkidle');
 
     // Remove interception for cleanup
     await page.unroute('**/api/tasks');
